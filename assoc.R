@@ -1,4 +1,9 @@
-get_obs <- function(f1, o11, n, f2) {
+build_args <- function(funs, val_fun, input) {
+  fun_args <- unlist(lapply(funs, formalArgs))
+  sapply(unique(fun_args), val_fun, input, simplify = FALSE)
+}
+
+get_obs <- function(f1, f2, o11, n) {
 # returns matrix with contingency table of observed frequencies
   cbind(o11,
         o12 = f2 - o11,
@@ -6,7 +11,7 @@ get_obs <- function(f1, o11, n, f2) {
         o22 = n - f1 - f2 + o11)
 }
 
-get_exp <- function(f1, o11, n, f2) {
+get_exp <- function(f1, f2, o11, n) {
 # returns matrix with contingency table of expected frequencies
   cbind(e11 = f1 * f2 / n,
         e12 = (n - f1) * f2 / n,
@@ -14,33 +19,36 @@ get_exp <- function(f1, o11, n, f2) {
         e22 = (n - f1) * (n - f2) / n)
 }
 
-build_args <- function(f1, o11, n, f2, fun) {
-# calculate values to use in FUN; returns list to use in call
-  arg_names <- unique(unlist(lapply(fun, formalArgs)))
-  arg_list <- sapply(arg_names, function(x) {
-    switch(x, n = n, f1 = f1, f2 = f2, o11 = o11,
-      o12 = f2 - o11,
-      o21 = f1 - o11,
-      o22 = n - f1 - f2 + o11,
-      e11 = f1 * f2 / n,
-      e12 = (n - f1) * f2 / n,
-      e21 = (n - f2) * f1 / n,
-      e22 = (n - f1) * (n - f2) / n,
-      r1  = f1,
-      c1  = f2,
-      r2  = n - f1,
-      c2  = n - f2,
-      o   = get_obs(f1, o11, n, f2),
-      e   = get_exp(f1, o11, n, f2),
-      stop(paste0("No built-in way to calculate `", arg, "`.")))
-    }, simplify = FALSE)
+get_assoc_vars <- function(x, input) {
+  with(input, switch(x, n = n, f1 = f1, f2 = f2, o11 = o11,
+    o12 = f2 - o11,
+    o21 = f1 - o11,
+    o22 = n - f1 - f2 + o11,
+    e11 = f1 * f2 / n,
+    e12 = (n - f1) * f2 / n,
+    e21 = (n - f2) * f1 / n,
+    e22 = (n - f1) * (n - f2) / n,
+    r1  = f1,
+    c1  = f2,
+    r2  = n - f1,
+    c2  = n - f2,
+    o   = get_obs(f1, f2, o11, n),
+    e   = get_exp(f1, f2, o11, n),
+    stop(paste0("No built-in way to calculate `", arg, "`."))
+  ))
 }
 
 coll_vec <- function(f1, o11, n, f2, fun = "ll", one_sided = FALSE) {
 # calculate normalization or association for frequency lists of co-occurrences
   if (!is.list(fun)) fun <- list(fun)
-  input_vals <- build_args(f1, o11, n, f2, fun)
-  sapply(fun, function(x) do.call(x, input_vals[names(formals(x))]))
+
+  input_vals <- build_args(fun, get_assoc_vars, list(
+    f1 = f1, o11 = o11, n = n, f2 = f2
+  ))
+
+  sapply(fun, function(x) {
+    do.call(x, input_vals[names(formals(x))])
+  })
 }
 
 make_one_sided <- function(assoc, o11, e11) {

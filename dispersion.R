@@ -1,36 +1,36 @@
 # Gries 2019: Analyzing dispersion
 sum_by <- function(group, x) rowsum(x, group)[, 1]
 
-build_args <- function(funs, v, f, words, parts) {
-# calculate values to use in FUN; returns list to use in call
-  arg_names <- unique(unlist(lapply(funs, formalArgs)))
-  n <- nlevels(parts)
-  sapply(arg_names, function(x) {
-    switch(x, words = words,
-      v      = v,              # frequency of word in each part
-      f      = f,              # overall frequency of word in corpus
-      l      = sum(v),         # corpus size in tokens
-      n      = n,              # number of parts
-      n_w    = table(words),   # number of parts word occurs in
-      # TODO: speed improv. with tabulate()?
-      rel    = f / n,
-      f_sqrt = sum_by(words, sqrt(v)),
-      # percentages word makes up of each corpus part (vectorized)
-      p = v / sum_by(parts, v)[parts],
-      # percentages of the n corpus part sizes (vectorized)
-      s = proportions(sum_by(parts, v))[parts],
-      stop(paste0("No built-in way to calculate `", arg, "`.")))
-  }, simplify = FALSE)
+build_args <- function(funs, val_fun, input) {
+  fun_args <- unlist(lapply(funs, formalArgs))
+  sapply(unique(fun_args), val_fun, input, simplify = FALSE)
+}
+
+get_dispersion_vars <- function(x, input) {
+  with(input, switch(x, words = words, v = v, f = f, n = n,
+    s = proportions(sum_by(parts, v))[parts], # % part in corpus (vectorized)
+    p = v / sum_by(parts, v)[parts],          # % word in part   (vectorized)
+    rel = f / n,                              # % word in corpus
+    n_w = table(words),                       # number of parts with word
+    f_sqrt = sum_by(words, sqrt(v)),          # sums of square roots per part
+    stop(paste0("No built-in way to calculate `", arg, "`."))
+  ))
 }
 
 dispersion <- function(v, words, parts, fun) {
-  f <- sum_by(words, v)
   if (!is.list(fun)) fun <- list(fun)
-  input_vals <- build_args(fun, v, f, words, parts)
+  f <- sum_by(words, v)  # overall frequency of word in corpus
+
+  input_vals <- build_args(fun, get_dispersion_vars, list(
+    v = v, words = words, parts = parts, f = f,
+    n = nlevels(parts)   # number of parts
+  ))
+
   disp <- sapply(fun, function(x) {
     do.call(x, input_vals[names(formals(x))])
-    })
-  data.frame(words = rownames(disp), freq = f, disp)
+  })
+
+  data.frame(words = rownames(disp), freq = f, disp, row.names = NULL)
 }
 
 part_range <- function(n_w)      n_w
