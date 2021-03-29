@@ -20,9 +20,3 @@ logl_dt <- function(x, n = sum(x$f1), f2 = sum(x$o11),
   if (one_sided == TRUE) x[o11 < e11, assoc := -assoc]
   if (sorted == TRUE) setorder(x, -assoc)
 }
-
-make_one_sided <- function(assoc, o11, e11) {
-  repulsed <- o11 < e11
-  assoc[repulsed] <- -assoc[repulsed]
-  assoc
-}

@@ -148,13 +148,13 @@ chi_squared_corr <- function(o11, o22, o12, o21, n, r1, r2, c1, c2)
   (n * (abs(o11 * o22 - o12 * o21) - n / 2)^2) / (r1 * r2 * c1 * c2)
 
 mi <- function(o11, e11)
-  log10(o11 / e11, 2)
+  log10(o11 / e11)
 
 mi_squared <- function(o11, e11)
-  log10(o11^2 / e11, 2)
+  log10(o11^2 / e11)
 
 odds_ratio_plain <- function(o)
-  log10((o[, 1] * o[, 4]) / (o[, 2] * o[, 3]), 10)
+  log10((o[, 1] * o[, 4]) / (o[, 2] * o[, 3]))
 
 odds_ratio <- function(o)
   odds_ratio_plain(o + 0.5)
