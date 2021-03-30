@@ -1,8 +1,3 @@
-build_args <- function(funs, val_fun, input) {
-  fun_args <- unlist(lapply(funs, formalArgs))
-  sapply(unique(fun_args), val_fun, input, simplify = FALSE)
-}
-
 get_obs <- function(f1, f2, o11, n) {
 # returns matrix with contingency table of observed frequencies
   cbind(o11,
@@ -61,6 +56,7 @@ make_one_sided <- function(assoc, o11, e11) {
 coll <- function(x, o11 = NULL, n = NULL, f2 = NULL,
                  fun = "ll", decreasing = TRUE, one_sided = FALSE) {
 # convenience wrapper around coll_vec
+  # TODO: repair. needs complete rewrite
   # word list
   if (is.data.frame(x)) {
     word_id <- grepl("character", sapply(x, class))
@@ -121,7 +117,7 @@ ll <- function(o, e)
   2 * rowSums(o * log10(o / e), na.rm = TRUE)
 
 fisher_pv <- function(o11, c1, c2, r1)
-  -log10(phyper(o11 - 1, c1, c2, r1, lower.tail = FALSE))
+  -log10(stats::phyper(o11 - 1, c1, c2, r1, lower.tail = FALSE))
 
 z_score <- function(o11, e11)
   (o11 - e11) / sqrt(e11)
@@ -185,14 +181,3 @@ mi_conf <- function(o11, e11, alpha = 2)
 
 poisson_pv <- function(o11, e11)
   -reg_gamma(o11, e11, log = TRUE)
-
-# maths helper functions, cf. UCS/R ------------------------------------
-reg_gamma_inv <- function(a, y, lower = TRUE, log = FALSE) {
-  if (log == TRUE) y <- y * log(10)
-  qgamma(y, shape = a, scale = 1, lower.tail = lower, log = log)
-}
-
-reg_gamma <- function(a, x, lower = TRUE, log = FALSE) {
-  ans <- pgamma(x, shape = a, scale = 1, lower.tail = lower, log = log)
-  if (log == TRUE) ans / log(10) else ans
-}

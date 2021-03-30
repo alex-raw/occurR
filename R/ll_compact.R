@@ -1,4 +1,24 @@
-vlogl <- function(f1, o11, n = sum(f1), f2 = sum(o11)) {
+#' Calculate G² (log-likelihood test) from vectors
+#'
+#' Two functions that calculate loglikelihood association measures
+#' for vectors of counts. Mostly for practice/demonstration purposes
+#'
+#' @param o11 numeric or integer with joint frequency
+#' @param f1 numeric or integer with frequencies of token
+#' @param f2 numeric or integer with frequencies of co-occurring token or construction
+#' if not provided, sum of joint frequencies (o11) is taken
+#' @param n numeric or integer with overall frequencies if not provided,
+#' sum of f1 is taken
+#' @param x data.table with named columns o11 and f1, optionally f2 and n
+#' @param one_sided logical. should repulsion be indicated by a negative sign?
+#' @param sorted logical. should output be sorted by association strength?
+#'
+#' @return numeric
+#' @examples
+#' lol_test <- ll_mini(c(thes = 41, is = 32, corpus = 41, data = 12), c(12, 1, 0, 3))
+
+#' @export
+ll_mini <- function(f1, o11, n = sum(f1), f2 = sum(o11)) {
   o <- cbind(o11,                 o12 = f2 - o11,
              o21 = f1 - o11,      o22 = n - f1 - f2 + o11)
   e <- cbind(e11 = f1 * f2,       e12 = (n - f1) * f2,
@@ -7,16 +27,31 @@ vlogl <- function(f1, o11, n = sum(f1), f2 = sum(o11)) {
   ifelse(o[, 1] < e[, 1], -assoc, assoc)
 }
 
-logl_dt <- function(x, n = sum(x$f1), f2 = sum(x$o11),
-                     one_sided = TRUE, sorted = TRUE) {
-  x[, `:=`(o12 = f2 - o11,
-           o21 = f1 - o11,          o22 = n - f1 - f2 + o11,
-           e11 = f1 * f2 / n,       e12 = (n - f1) * f2 / n,
-           e21 = (n - f2) * f1 / n, e22 = (n - f2) * (n - f1) / n)
-  ][, assoc :=
-        2 * Reduce("+", Map(function(o, e) fifelse(o == 0, 0, o * log(o / e)),
-                            list(o11, o12, o21, o22), list(e11, e12, e21, e22)))
-  ][, c("o12", "o21", "o22", "e12", "e21", "e22") := NULL]
-  if (one_sided == TRUE) x[o11 < e11, assoc := -assoc]
-  if (sorted == TRUE) setorder(x, -assoc)
+#' @rdname ll_mini
+#' @import data.table
+#' @export
+ll_dt <- function(x, n = sum(x$f1), f2 = sum(x$o11),
+                  one_sided = TRUE, sorted = TRUE) {
+
+  if (!requireNamespace("data.table", quietly = TRUE)) {
+    stop("Package \"data.table\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
+  datatable.aware = TRUE
+
+  x[, `:=`(e11 = f1 * f2 / n,
+        assoc = 2 * Reduce("+", Map(function(o, e)
+          fifelse(o == 0, 0, o * log(o / e)),
+          list(o11, f2 - o11,
+               f1 - o11, n - f1 - f2 + o11),
+          list(f1 * f2 / n, (n - f1) * f2 / n,
+               (n - f2) * f1 / n, (n - f2) * (n - f1) / n))
+   ))]
+
+  if (isTRUE(one_sided)) x[o11 < e11, `:=`(assoc, -assoc)]
+  if (isTRUE(sorted)) setorder(x, -assoc)
 }
+
+# due to NSE notes in R CMD check
+o11 <- f1 <- assoc <- e11 <- NULL

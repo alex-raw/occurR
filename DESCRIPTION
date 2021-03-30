@@ -1,15 +1,19 @@
 Package: occurR
-Title: What the Package Does (One Line, Title Case)
+Title: Tools for Working with Word Frequency Lists
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Authors@R:
+    person(given = "Alexander",
+           family = "Rauhut",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "alexraw@mailbox.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+URL: www.alexraw.xyz
+Description: Tools to calculate association and dispersion measures from various types of word frequency data.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Imports:
+  stats,
+  data.table
