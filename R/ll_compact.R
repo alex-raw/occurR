@@ -16,7 +16,7 @@
 #' @return numeric
 #' @examples
 #' lol_test <- ll_mini(c(thes = 41, is = 32, corpus = 41, data = 12), c(12, 1, 0, 3))
-
+#'
 #' @export
 ll_mini <- function(f1, o11, n = sum(f1), f2 = sum(o11)) {
   o <- cbind(o11,                 o12 = f2 - o11,
@@ -30,7 +30,7 @@ ll_mini <- function(f1, o11, n = sum(f1), f2 = sum(o11)) {
 #' @rdname ll_mini
 #' @import data.table
 #' @export
-ll_dt <- function(x, n = sum(x$f1), f2 = sum(x$o11),
+ll_dt <- function(x, n = sum(x$f1), f2 = sum(x$o11), fun = "ll",
                   one_sided = TRUE, sorted = TRUE) {
 
   if (!requireNamespace("data.table", quietly = TRUE)) {
@@ -40,15 +40,8 @@ ll_dt <- function(x, n = sum(x$f1), f2 = sum(x$o11),
 
   datatable.aware = TRUE
 
-  x[, `:=`(e11 = f1 * f2 / n,
-        assoc = 2 * Reduce("+", Map(function(o, e)
-          fifelse(o == 0, 0, o * log(o / e)),
-          list(o11, f2 - o11,
-               f1 - o11, n - f1 - f2 + o11),
-          list(f1 * f2 / n, (n - f1) * f2 / n,
-               (n - f2) * f1 / n, (n - f2) * (n - f1) / n))
-   ))]
-
+  # TODO: matrix output doesn't work
+  x[, (fun) := data.frame(v_assoc(f1, o11, f2, n, fun))]
   if (isTRUE(one_sided)) x[o11 < e11, `:=`(assoc, -assoc)]
   if (isTRUE(sorted)) setorder(x, -assoc)
 }

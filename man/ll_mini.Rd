@@ -7,7 +7,14 @@
 \usage{
 ll_mini(f1, o11, n = sum(f1), f2 = sum(o11))
 
-ll_dt(x, n = sum(x$f1), f2 = sum(x$o11), one_sided = TRUE, sorted = TRUE)
+ll_dt(
+  x,
+  n = sum(x$f1),
+  f2 = sum(x$o11),
+  fun = "ll",
+  one_sided = TRUE,
+  sorted = TRUE
+)
 }
 \arguments{
 \item{f1}{numeric or integer with frequencies of token}
@@ -34,5 +41,6 @@ Two functions that calculate loglikelihood association measures
 for vectors of counts. Mostly for practice/demonstration purposes
 }
 \examples{
-lol_test <- ll_mini(c(this = 41, is = 32, corpus = 41, data = 12), c(12, 1, 0, 3))
+lol_test <- ll_mini(c(thes = 41, is = 32, corpus = 41, data = 12), c(12, 1, 0, 3))
+
 }

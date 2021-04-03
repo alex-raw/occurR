@@ -1,7 +1,16 @@
 # library(data.table)
+# # load_all()
 
-# cwb-decode:      1m27s + 18s fread and .N by word/part
-# cwb-scan-corpus: 0m46s +
+# rauhut <- function(words, v, parts) {
+#    f <- rowsum(v, words)[words, ]
+#    s <- proportions(rowsum(v, parts))[parts, ]
+#    m <- cbind(s, abs(v / f - s))
+#    m <- rowsum(m, words, reorder = FALSE)
+#    m[, 1L] <- 1 - m[, 1L]
+#    (rowSums(m) / 2) / (1 - min(s))
+# }
+# # cwb-decode:      1m27s + 18s fread and .N by word/part
+# # cwb-scan-corpus: 0m46s +
 
 # microbenchmark::microbenchmark(
 # lel <- fread("bnc_word_id_full",
@@ -80,75 +89,79 @@
 #   "Washtell's Self Dispersion" <- NA
 # }
 
-# dp <- function(v, s, f) sum(abs((v / f) - s)) / 2
-# dp_norm <- function(v, s, f) dp(v, s, f) / (1 - min(s))
-# kromer_ur <- function(v) sum(digamma(v + 1) - digamma(1))
-# part_range <- function(v) sum(v > 0)
-# rosengren_s_eq <- function(v, n, f) ((sum(sqrt(v))^2) / n) / f
-# rosengren_s_uneq <- function(v, s, f) sum(sqrt(v * s))^2 / f
-# rosengren_adj_freq_eq <- function(v, n) (sum(sqrt(v))^2) / n
-# rosengren_adj_freq_uneq <- function(v, s) sum(sqrt(v * s))^2
-# dc <- function(v, n) ((sum(sqrt(v)) / n)^2) / mean(v)
-# idf <- function(v, n) log2(n / sum(v > 0))
-# engvall <- function(v, n, f) f * (sum(v > 0) / n)
-# carroll_d2 <- function(p, n) {
-#   ans <- p / sum(p)
-#   ans <- ans[ans > 0]
-#   -sum(ans * log2(ans)) / log2(n)
-# }
-# carroll_um <- function(p, n, f) {
-#   d2 <- carroll_d2(p, n)
-#   (f * d2) + (1 - d2) * (f / n)
-# }
-# kld <- function(v, s, f) {
-#   post_true <- v / f
-#   logs <- log2(post_true / s)
-#   logs[logs == -Inf] <- 0
-#   sum(post_true * logs) # could be normalized as 1-2^(-kld)
-# }
-# sd_pop <- function(v)
-#   sd(v) * sqrt((length(v) - 1) / length(v))
-
-# vc <- function(v)
-#   sd_pop(v) / mean(v)
-
-# juilland_d_eq <- function(v, n)
-#   1 - (vc(v) / sqrt(n - 1))
-
-# juilland_u_eq <- function(v, n, f)
-#   f * juilland_d_eq(v, n)
-
-# juilland_d_uneq <- function(v, n, p)
-#   1 - ((sd_pop(v) / mean(p)) / sqrt(n - 1))
-
-# juilland_u_uneq <- function(v, n, p)
-#   f * juilland_d_uneq(v, n, p)
-
-# chi_squared <- function(v, s, f)
-#   sum(((v - (s * f))^2) / (s * f))
-
-# lyne_d3 <- function(v, s, f)
-#   1 - chi_squared(v, s, f) / (4 * f)
-
-# x <- with(na.omit(df), Matrix::sparseMatrix(
-#   as.numeric(words),
-#   as.numeric(parts),
-#   x = Freq,
-#   dimnames = list(levels(words),
-#                   levels(parts)), repr = "C"))
-# dp.matrix <- function(x) {
-#   # for a cross tabulated matrix: rows = words, cols = parts
-#   # matrices produced are too big for, e.g. BNC
-#   dp <- colSums(abs(t(x / rowSums(x)) - (
-#   s <- proportions(colSums(x))))) / 2
-#   dp / (1 - min(s))
+# get_dispersion_vars <- function(x) {
+#   switch(x, words = words, v = v, f = f, n = n,
+#     s = proportions(sum_by(parts, v))[parts], # % part in corpus (vectorized)
+#     p = v / sum_by(parts, v)[parts],          # % word in part   (vectorized)
+#     rel = f / n,                              # % word in corpus
+#     n_w = table(words),                       # number of parts with word
+#     f_sqrt = sum_by(words, sqrt(v)),          # sums of square roots per part
+#     stop(paste0("No built-in way to calculate `", arg, "`."))
+#   )
 # }
 
-# rauhut <- function(words, v, parts) {
-#    f <- rowsum(v, words)[words, ]
-#    s <- proportions(rowsum(v, parts))[parts, ]
-#    m <- cbind(s, abs(v / f - s))
-#    m <- rowsum(m, words, reorder = FALSE)
-#    m[, 1L] <- 1 - m[, 1L]
-#    (rowSums(m) / 2) / (1 - min(s))
+# formulae <- expression(
+#   part_range  = sum(v > 0),
+#   dp          = sum(abs((v / f) - s)) / 2,
+#   dp_norm     = dp(v, s, f) / (1 - min(s)),
+#   vc          = sd_pop(v) / mean(v),
+#   dc          = ((sum(sqrt(v)) / n)^2) / mean(v),
+#   idf         = log2(n / sum(v > 0)),
+#   sd_pop      = sd(v) * sqrt((length(v) - 1) / length(v)),
+#   engvall     = f * (sum(v > 0) / n),
+#   kromer_ur   = sum(digamma(v + 1) - digamma(1)),
+#   j_d_eq      = 1 - (vc(v) / sqrt(n - 1)),
+#   j_u_eq      = f * juilland_d_eq(v, n),
+#   j_d_uneq    = 1 - ((sd_pop(v) / mean(p)) / sqrt(n - 1)),
+#   j_u_uneq    = f * juilland_d_uneq(v, n, p),
+#   r_s_eq      = ((sum(sqrt(v))^2) / n) / f,
+#   r_s_uneq    = sum(sqrt(v * s))^2 / f,
+#   r_adj_eq    = (sum(sqrt(v))^2) / n,
+#   r_adj_uneq  = sum(sqrt(v * s))^2,
+#   chi_squared = sum(((v - (s * f))^2) / (s * f)),
+#   lyne_d3     = 1 - chi_squared(v, s, f) / (4 * f),
+#   carroll_d2  = {
+#     ans <- p / sum(p)
+#     ans <- ans[ans > 0]
+#     -sum(ans * log2(ans)) / log2(n)
+#   },
+#   carroll_um  = {
+#     d2 <- carroll_d2(p, n)
+#     (f * d2) + (1 - d2) * (f / n)
+#   },
+#   kld = {
+#     post_true <- v / f
+#     logs <- log2(post_true / s)
+#     logs[logs == -Inf] <- 0
+#     sum(post_true * logs) # could be normalized as 1-2^(-kld)
+#   }
+# )
+
+# f <- c(1, 2, 3)
+# n <- 10
+# v <- 10000
+# test_fun <- c("engvall", "kromer_ur")
+
+# get_vars <- function(input, funs, val_fun)
+# expr <- build_args(formulae[test_fun], get_dispersion_vars)
+# get_formulae()[test_fun]
+
+# with(args_, lapply(expr, eval))
+
+# build_args <- function(funs, val_fun) {
+#   fun_args <- unlist(lapply(funs, all.vars))
+#   sapply(unique(fun_args), val_fun, simplify = FALSE)
 # }
+
+# freq_list <- read.delim("../blog/test_data/brown_word_id",
+#   quote = "",
+#   na.strings = "",
+#   header = FALSE,
+#   fill = TRUE,
+#   colClasses = c("numeric", "factor", "factor"),
+#   col.names = c("Freq", "words", "parts")
+# )
+
+# lol <- with(freq_list, dispersion(Freq, words, parts, c("dp", "dp_norm")))
+# lol <- with(freq_list, dispersion(Freq, words, parts, names(get_formulae())
+# ))

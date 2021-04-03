@@ -1,5 +1,5 @@
 build_args <- function(funs, val_fun, input) {
-  fun_args <- unlist(lapply(funs, function(x) names(formals(x))))
+  fun_args <- unlist(lapply(funs, all.vars))
   sapply(unique(fun_args), val_fun, input, simplify = FALSE)
 }
 
@@ -13,3 +13,12 @@ reg_gamma <- function(a, x, lower = TRUE, log = FALSE) {
   ans <- stats::pgamma(x, shape = a, scale = 1, lower.tail = lower, log = log)
   if (log == TRUE) ans / log(10) else ans
 }
+
+make_one_sided <- function(assoc, o11, e11) {
+  # negative values for negative association
+  repulsed <- o11 < e11
+  assoc[repulsed] <- -assoc[repulsed]
+  assoc
+}
+
+z_score <- function(o11, e11) (o11 - e11) / sqrt(e11)
