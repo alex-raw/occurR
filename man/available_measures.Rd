@@ -2,11 +2,13 @@
 % Please edit documentation in R/assoc.R
 \name{available_measures}
 \alias{available_measures}
-\title{Association Measures}
+\title{Builtin measures}
 \usage{
-available_measures()
+available_measures(type)
+}
+\arguments{
+\item{type}{character, either "assoc" or "disp"}
 }
 \description{
 Display names of built-in association measures to be used in
-\code{v_assoc}
 }

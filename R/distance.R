@@ -46,3 +46,41 @@
 # old["DING"]
 # old["DING"]
 # old[dwg == 1]
+
+# # distance-based measures from SavickÃ½ and HlavÃ¡covÃ¡
+# wheres.which <- which(wheres)
+# distances <- diff(c(0, wheres.which + (length(corpus) - max(wheres.which))))
+# segments <- rep(l / f, f)
+
+# f_arf <- function(l, f, distances, segments)
+#   sum(pmin(distances, segments)) / (l / f)
+
+# awt <- function(l, distances)
+#   0.5 * (1 + (1 / l * sum(distances^2)))
+
+# f_awt <- function(l, distances)
+#   l / ((2 * awt(l, distances)) - 1) # l ^ 2 / sum(distances^2)
+
+# ald <- function(l, distances)
+#   sum(distances * log10(distances)) / l
+
+# f_ald <- function(l, distances)
+#   l * 10 ^ (-ald(l, distances)) # exp(-sum(distances / l * log(distances / l)))
+
+# # Washtell
+# # table(words) == 1
+
+# denominator <- (2 * f) / l
+# candidates <- rownames(frequencies.of.element.in.corpus.parts.df)[v > 1]
+# if (length(candidates) > 0) {
+#   g <- sum(v[v > 1])
+#   reduced.corpus <- corpus[corpus.parts %in% candidates]
+#   reduced.parts <- corpus.parts[corpus.parts %in% candidates]
+#   within.part.distances <- tapply(reduced.corpus, reduced.parts,
+#                                   function(x) which(x == element))
+#   min.dists <- unlist(sapply(within.part.distances, min.distance.finder))
+#   numerator <- (1 / g) * sum(1 / min.dists)
+#   "Washtell's Self Dispersion" <- numerator / denominator
+# } else {
+#   "Washtell's Self Dispersion" <- NA
+# }

@@ -12,7 +12,7 @@ get_exp <- function(f1, f2, o11, n) {
         e22 = (n - f1) * (n - f2) / n)
 }
 
-get_vars <- function(arg, input) {
+get_assoc_vars <- function(arg, input) {
   # get vectors of values in a contingency table, cf. Evert (2004)
   with(input, switch(arg, n = n, f1 = f1, f2 = f2, o11 = o11,
     r1  = f1,
@@ -36,25 +36,25 @@ get_vars <- function(arg, input) {
 builtin_assoc <- function() {
   # cf. Evert (2004) & http://www.collocations.de
   expression(
-    ll          = 2 * rowSums(o * log(o / e), na.rm = TRUE),
-    mi          = log10(o11 / e11),
-    mi_squared  = log10(o11^2 / e11),
-    mi_conf     = log10(reg_gamma_inv(o11, -alpha - log10(2), log = TRUE) / e11),
-    fisher_pv   = -log10(stats::phyper(o11 - 1, c1, c2, r1, lower.tail = FALSE)),
-    poisson_pv  = -reg_gamma(o11, e11, log = TRUE),
-    t_score     = (o11 - e11) / sqrt(o11),
-    rel_risk    = log10((o11 * c2) / (o12 * c1)),
-    lidell      = (n * (o11 - e11)) / (c1 * c2),
-    gmean       = o11 / sqrt(n * e11),
-    dice        = (2 * o11) / (r1 + c1),
-    jaccard     = o11 / (o11 + o12 + o21),
-    z_score     = (o11 - e11) / sqrt(e11),
-    z_score_cor = z_score(ifelse(o11 > e11, o11 - 0.5, o11 + 0.5), e11),
-    chisq       = (n * ((o11 - e11)^2)) / (e11 * e22),
-    chisq_i     = rowSums(((o - e)^2) / e, na.rm = TRUE),
-    chisq_h     = (n * (o11 * o22 - o12 * o21)^2) / (r1 * r2 * c1 * c2),
-    chisq_corr  = (n * (abs(o11 * o22 - o12 * o21) - n / 2)^2) / (r1 * r2 * c1 * c2),
-    min_sens    = ifelse((o11 / r1) < (o11 / c1), o11 / r1, o11 / c1),
+    ll         = 2 * rowSums(o * log(o / e), na.rm = TRUE),
+    mi         = log10(o11 / e11),
+    mi_squared = log10(o11^2 / e11),
+    mi_conf    = log10(reg_gamma_inv(o11, -alpha - log10(2), log = TRUE) / e11),
+    fisher_pv  = -log10(stats::phyper(o11 - 1, c1, c2, r1, lower.tail = FALSE)),
+    poisson_pv = -reg_gamma(o11, e11, log = TRUE),
+    t_score    = (o11 - e11) / sqrt(o11),
+    rel_risk   = log10((o11 * c2) / (o12 * c1)),
+    lidell     = (n * (o11 - e11)) / (c1 * c2),
+    gmean      = o11 / sqrt(n * e11),
+    dice       = (2 * o11) / (r1 + c1),
+    jaccard    = o10 / (o11 + o12 + o21),
+    zscore     = (o11 - e11) / sqrt(e11),
+    zscore_cor = zscore(ifelse(o11 > e11, o11 - 0.5, o11 + 0.5), e11),
+    chisq      = (n * ((o11 - e11)^2)) / (e11 * e22),
+    chisq_i    = rowSums(((o - e)^2) / e, na.rm = TRUE),
+    chisq_h    = (n * (o11 * o22 - o12 * o21)^2) / (r1 * r2 * c1 * c2),
+    chisq_corr = (n * (abs(o11 * o22 - o12 * o21) - n / 2)^2) / (r1 * r2 * c1 * c2),
+    min_sens   = ifelse((o11 / r1) < (o11 / c1), o11 / r1, o11 / c1),
     poisson_stirling = o11 * (log10(o11) - log10(e11) - 1),
     odds_ratio  = {
       o <- o + 0.5
@@ -62,14 +62,6 @@ builtin_assoc <- function() {
     }
   )
 }
-
-#' Association Measures
-#'
-#' Display names of built-in association measures to be used in
-#' \code{v_assoc}
-#'
-#' @export
-available_measures <- function() names(builtin_assoc())
 
 #' Vectorized calculation of association measures
 #'
@@ -88,6 +80,7 @@ available_measures <- function() names(builtin_assoc())
 #' @details coming soon ...
 #'
 #' @export
+
 v_assoc <- function(f1, o11, f2 = NULL, n = NULL, fun = "ll") {
   if (is.null(f2)) f2 <- sum(o11)
   if (is.null(n)) n <- sum(f1)
@@ -110,7 +103,7 @@ v_assoc <- function(f1, o11, f2 = NULL, n = NULL, fun = "ll") {
   )
 
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
-  vars <- sapply(all.vars(exprs), get_vars, input, simplify = FALSE)
+  vars <- sapply(all.vars(exprs), get_assoc_vars, input, simplify = FALSE)
   out <- vapply(exprs, eval, numeric(length(f1)), vars)
 
   if (is.function(fun)) colnames(out) <- deparse(substitute(fun))
@@ -121,4 +114,19 @@ v_assoc <- function(f1, o11, f2 = NULL, n = NULL, fun = "ll") {
 coll <- function(x, o11 = NULL, n = NULL, f2 = NULL,
                  fun = "ll", decreasing = TRUE, one_sided = FALSE) {
   # generic function coming here for data.frames, data.tables and matrix input
+}
+
+#' Builtin measures
+#'
+#' Display names of built-in association measures to be used in
+#'
+#' @param type character, either "assoc" or "disp"
+#'
+#' @export
+
+available_measures <- function(type) {
+  switch(type,
+    assoc = names(builtin_assoc()),
+    disp = names(builtin_disp())
+  )
 }

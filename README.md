@@ -1,3 +1,7 @@
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/alex-raw/occurR/workflows/R-CMD-check/badge.svg)](https://github.com/alex-raw/occurR/actions)
+<!-- badges: end -->
+
 ## occurR
 
 Mostly tools for working with word frequency lists.
