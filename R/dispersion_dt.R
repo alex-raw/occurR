@@ -1,77 +1,74 @@
-# library(data.table)
+annotate_vals <- function(dt, s = TRUE, p = TRUE) {
+  if (s) dt[, s := sum(v), by = part][, s := s / sum(dt$v)]
+  if (p) dt[, p := v / s][, `:=`(
+    p_sum = sum(p), f = sum(v)), by = word]
+  else
+    dt[, f := sum(v), by = word]
+}
 
-# rauhut <- function(words, v, parts) {
-#    f <- rowsum(v, words)[words, ]
-#    s <- proportions(rowsum(v, parts))[parts, ]
-#    m <- cbind(s, abs(v / f - s))
-#    m <- rowsum(m, words, reorder = FALSE)
-#    m[, 1L] <- 1 - m[, 1L]
-#    (rowSums(m) / 2) / (1 - min(s))
-# }
+# bquote hack solves scoping problems with shared variable n in dt[, eval(x)]
+pre_sum_expr <- function(n) bquote(`:=`(
+  p      = v / s,
+  f_sqrt = sqrt(v),
+  f.R    = sqrt(v * s),
+  kld    = (v / f) * log2(v / f / s),
+  sd.pop = (v - f / .(n))^2,
+  dp     = abs(v / f - s),
+  chisq  = (v - s * f)^2 / (s * f),
+  D      = (p - p_sum / .(n))^2,
+  D2     = (p / p_sum) * log2(p / p_sum),
+  Ur     = digamma(v + 1) + -digamma(1)
+))
 
-# lal <- fread("../blog/test_data/bnc_word_id",
-#   col.names = c("freq", "word", "part"),
-#   key = c("word", "part"),
-#   sep = "\t",
-#   quote = "",
-#   na.string = "",
-#   # stringsAsFactors = TRUE,
-#   fill = TRUE
-# )
+grouped_expr <- function(n) bquote(list(
+  f      = f[1],
+  range  = .N,
+  maxmin = max(v) - fifelse(.N < .(n), 0, min(v)),
+  p_sum  = p_sum[1],
+  f_sqrt = sum(f_sqrt),
+  sd.pop = sum(sd.pop),
+  f.R    = sum(f.R),
+  kld    = sum(kld),
+  D      = sum(D),
+  dp     = sum(dp),
+  s      = sum(s),
+  D2     = sum(D2),
+  chisq  = sum(chisq),
+  Ur     = sum(Ur)
+))
 
-# build_args <- function(funs, val_fun) {
-#   fun_args <- unlist(lapply(funs, all.vars))
-#   sapply(unique(fun_args), val_fun, simplify = FALSE)
-# }
+post_sum_expr <- function(n) bquote(`:=`(
+  f.R      = f.R^2,
+  f.R.eq   = f_sqrt^2 / .(n),
+  idf      = log2(.(n) / range),
+  dp       = (dp + 1 - s) / 2,
+  chisq    = chisq + (1 - s) * f,
+  D2       = -D2 / log2(.(n)),
+  kld.norm = 1 - 2^-kld,
+  sd.pop   = sqrt((sd.pop + ((.(n) - range) * (f / .(n))^2)) / .(n)),
+  D        = sqrt((D + ((.(n) - range) * (p_sum / .(n))^2)) / .(n)),
+  f_mean   = f / .(n)
+))
 
-# freq_list <- read.delim("../blog/test_data/brown_word_id",
-#   quote = "",
-#   na.strings = "",
-#   header = FALSE,
-#   fill = TRUE,
-#   colClasses = c("numeric", "factor", "factor"),
-#   col.names = c("Freq", "words", "parts")
-# )
+norm_expr <- function(n) bquote(`:=`(
+  dc      = (f_sqrt / .(n))^2 / f_mean,
+  dp.norm = dp / (1 - min(s)),
+  engvall = range * f_mean,
+  Um      = f * D2 + (1 - D2) * f_mean,
+  vc.pop  = sd.pop / f_mean,
+  D_eq    = 1 - sd.pop / f_mean / sqrt(.(n) - 1),
+  D       = 1 - D / (p_sum / .(n)) / sqrt(.(n) - 1),
+  S       = f.R / f,
+  S.eq    = f.R.eq / f,
+  D3      = 1 - chisq / (4 * f),
+  f_mean  = NULL, s = NULL, f_sqrt = NULL, p_sum = NULL
+))
 
-# lol <- with(freq_list, dispersion(Freq, words, parts, c("dp", "dp_norm")))
-# lol <- with(freq_list, dispersion(Freq, words, parts, names(get_formulae())
-# ))
-
-# # # old ones from Gries
-# # formulae <- expression(
-# #   part_range  = sum(v > 0),
-# #   dp          = sum(abs((v / f) - s)) / 2,
-# #   dp_norm     = dp(v, s, f) / (1 - min(s)),
-# #   vc          = sd_pop(v) / mean(v),
-# #   dc          = ((sum(sqrt(v)) / n)^2) / mean(v),
-# #   idf         = log2(n / sum(v > 0)),
-# #   sd_pop      = sd(v) * sqrt((length(v) - 1) / length(v)),
-# #   engvall     = f * (sum(v > 0) / n),
-# #   kromer_ur   = sum(digamma(v + 1) - digamma(1)),
-# #   j_d_eq      = 1 - (vc(v) / sqrt(n - 1)),
-# #   j_u_eq      = f * juilland_d_eq(v, n),
-# #   j_d_uneq    = 1 - ((sd_pop(v) / mean(p)) / sqrt(n - 1)),
-# #   j_u_uneq    = f * juilland_d_uneq(v, n, p),
-# #   r_s_eq      = ((sum(sqrt(v))^2) / n) / f,
-# #   r_s_uneq    = sum(sqrt(v * s))^2 / f,
-# #   r_adj_eq    = (sum(sqrt(v))^2) / n,
-# #   r_adj_uneq  = sum(sqrt(v * s))^2,
-# #   chi_squared = sum(((v - (s * f))^2) / (s * f)),
-# #   lyne_d3     = 1 - chi_squared(v, s, f) / (4 * f),
-# #   carroll_d2  = {
-# #     ans <- p / sum(p)
-# #     ans <- ans[ans > 0]
-# #     -sum(ans * log2(ans)) / log2(n)
-# #   },
-# #   carroll_um  = {
-# #     d2 <- carroll_d2(p, n)
-# #     (f * d2) + (1 - d2) * (f / n)
-# #   },
-# #   kld = {
-# #     post_true <- v / f
-# #     logs <- log2(post_true / s)
-# #     logs[logs == -Inf] <- 0
-# #     sum(post_true * logs) # could be normalized as 1-2^(-kld)
-# #   }
-# # )
-
+dispersion_dt <- function(x, n = uniqueN(x$part))
+  annotate_vals(x, T, T
+    )[, eval(pre_sum_expr(n))
+    ][, eval(grouped_expr(n)), by = word
+    ][, eval(post_sum_expr(n))
+    ][, eval(norm_expr(n))
+    ][, `:=`(U = D * f, U.eq = D_eq * f)
+][]
