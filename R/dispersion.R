@@ -1,64 +1,81 @@
-sum_by <- function(group, x)
-  as.numeric(rowsum.default(x, group))
+# math helpers
+max_min0 <- function(x, group, n, range)
+  collapse::fmax.default(x, group) -
+    ifelse(range < n, 0, collapse::fmin.default(x, group))
 
-sd_pop <- function(v, n, range, rel, words)
-  sqrt((sum_by(words, (v - rel[words])^2) + ((n - range) * rel^2)) / n)
+chisq0 <- function(v, s, f, group, s_sum) {
+  f_exp <- s * f[group]
+  ((1 - s_sum) * f) + sum_by(group, (v - f_exp)^2 / f_exp)
+}
 
+carroll_d2 <- function(p, p_sum, group, n) {
+    x <- p / p_sum[group]
+    -sum_by(group, x * log2(x)) / log2(n)
+}
+
+juilland_d <- function(p, n, range, p_sum, group) {
+  p_mean <- p_sum / n
+  1 - sd_pop(p, n, range, p_mean, group) / p_mean / sqrt(n - 1)
+}
+
+kromer <- function(x, group)
+  sum_by(group, Rfast::Digamma(x + 1) - Rfast::Digamma(1))
+
+sd_pop <- function(v, n, range, rel, group)
+  sqrt((sum_by(group, (v - rel[group])^2) + ((n - range) * rel^2)) / n)
+
+sd_inner <- function(tokens, v, rel, zeros)
+  sum_by(tokens, (v - rel[tokens])^2) + zeros * rel^2
+
+# meta
 builtin_disp <- function() expression(
-    n = nlevels(parts),
+  ids = as_factor(parts), n = nlevels(ids), sizes = sum_by(ids, v),
 
-    # vectorized values
-    sizes    = sum_by(parts, v),
-    s        = proportions(sizes)[parts],  # % part in corpus
-    p        = v / sizes[parts],           # % word in part
-    v_rel    = v / f[words],               # % word in part
-    f_mean   = f / n,                      # % word in corpus
-    sum_prop = sum_by(words, p),
-    p_mean   = sum_prop / n,               # % part in corpus
-    f_sqrt   = sum_by(words, sqrt(v))^2,   # squared sum of roots
+  # vectorized values               # v = count in part
+  f      = sum_by(words, v),        # count word in corpus
+  s      = proportions(sizes)[ids], # % part in corpus
+  p      = v / sizes[ids],          # % word in part
+  v_rel  = v / f[words],
+  f_mean = f / n,
 
-    # Gries 2019: Analyzing dispersion
-    range    = tabulate(words),
-    maxmin   = tapply(v, words, max) - ifelse(range < n, 0, tapply(v, words, min)), # TODO: slow!
-    engvall  = range * f_mean,
-    idf      = log2(n / range),
-    dc       = f_sqrt / (n * f),
-    Ur       = sum_by(words, digamma(v + 1) - digamma(1)),
-    kld      = sum_by(words, v_rel * log2(v_rel / s)),
-    f.R      = sum_by(words, sqrt(v * s))^2,
-    f.R.eq   = f_sqrt / n,
-    S        = f.R / f,
-    S.eq     = f.R.eq / f,
-    sd.pop   = sd_pop(v, n, range, f_mean, words),
-    vc.pop   = sd.pop / f_mean,
-    D_eq     = 1 - vc.pop / sqrt(n - 1),
-    D        = 1 - sd_pop(p, n, range, p_mean, words) / p_mean / sqrt(n - 1),
-    U.eq     = D_eq * f,
-    U        = D * f,
-    dp       = {
-      x <- rowsum(cbind(s, abs(v_rel - s)), words)
-      (1 - x[, 1L] + x[, 2L]) / 2
-    },
-    D2       = {
-      x <- p / sum_prop[words]
-      -sum_by(words, x * log2(x)) / log2(n)
-    },
-    chisq    = {
-      f_exp <- s * f[words]
-      x <- rowsum(cbind(s, (v - f_exp)^2 / f_exp), words)
-      ((1 - x[, 1L]) * f) + x[, 2L]
-    },
-    Um       = (f * D2) + (1 - D2) * f_mean,
-    kld.norm = 1 - 2^-kld,
-    dp.norm  = dp / (1 - min(s)),
-    D3       = 1 - chisq / (4 * f)
+  # shared values
+  p_sum  = sum_by(words, p),
+  s_sum  = sum_by(words, s),
+  f_sqrt = sum_by(words, sqrt(v)),
+  range  = tabulate(words),
+
+  # measures from Gries 2019: Analyzing dispersion
+  maxmin   = max_min0(v, words, n, range),
+  engvall  = range * f_mean,
+  Ur       = kromer(v, words),
+  idf      = log2(n / range),
+  dc       = (f_sqrt / n)^2, # BUG: something is off here
+  sd.pop   = sd_pop(v, n, range, f_mean, words),
+  vc.pop   = sd.pop / f_mean,
+  D.eq     = 1 - vc.pop / sqrt(n - 1),
+  U.eq     = D.eq * f,
+  kld      = sum_by(words, v_rel * log2(v_rel / s)),
+  kld.norm = 1 - 2^-kld,
+  f.R      = sum_by(words, sqrt(v * s))^2,
+  S        = f.R / f,
+  f.R.eq   = f_sqrt^2 / n,
+  S.eq     = f.R.eq / f,
+  D        = juilland_d(p, n, range, p_sum, words),
+  U        = D * f,
+  D2       = carroll_d2(p, p_sum, words, n),
+  Um       = (f * D2) + (1 - D2) * f_mean,
+  dp       = (1 - s_sum + sum_by(words, abs(v_rel - s))) / 2,
+  dp.norm  = dp / (1 - min(s)),
+  chisq    = chisq0(v, s, f, words, s_sum),
+  D3       = 1 - chisq / (4 * f)
 )
 
+# meta-helpers
 recurse_vars <- function(funs, exprs)
   if (identical(funs, out <- union(all.vars(exprs[funs]), funs)))
     return(out) else recurse_vars(out, exprs)
 
-calculate_disp <- function(funs, start_vals, exprs = builtin_disp()) {
+calculate_disp <- function(start_vals, funs = all_measures(), exprs = builtin_disp()) {
   funs <- intersect(recurse_vars(funs, exprs), names(exprs))
   exprs <- exprs[funs]
   start_vals[funs] <- 0L
@@ -67,15 +84,21 @@ calculate_disp <- function(funs, start_vals, exprs = builtin_disp()) {
   start_vals
 }
 
-dispersion <- function(v, words, parts, funs = "dp.norm") {
-  stopifnot(is.numeric(v), identical(length(v), length(words), length(parts)))
+# core helpers
+sum_by <- function(f, x) collapse::fsum.default(x, f, use.g.names = FALSE)
 
-  input <- list(
-    v = as.numeric(v),
-    words = as.factor(words),
-    parts = as.factor(parts),
-    f = sum_by(words, v)
-  )
+as_factor <- function(x) {
+  if (is.factor(x)) return(x)
+  uniqx <- collapse::funique(x)
+  factorcpp(x, uniqx)
+}
+
+#' @export
+dispersion <- function(freqs, tokens, parts, funs = "dp.norm") {
+  stopifnot(identical(length(freqs), length(tokens), length(parts)))
+
+  tokens <- as_factor(tokens)
+  input <- list(v = freqs, words = tokens, parts = parts)
 
   if (anyNA(input, recursive = TRUE)) warning("NA values in input.")
 
@@ -86,13 +109,13 @@ dispersion <- function(v, words, parts, funs = "dp.norm") {
     stop("No built-in measure named: ", mismatch,
          "; see available_measures(\"disp\")")
 
-  out <- calculate_disp(funs, input, exprs)[funs]
-  if (!is.null(names(funs))) names(out) <- names(funs)
+  ans <- calculate_disp(input, funs, exprs)[c("f", funs)]
 
-  data.frame(
-    word = levels(words),
-    freq = input$f,
-    out,
-    row.names = NULL
-  )
+  if (!is.null(names(funs))) names(ans) <- names(funs)
+  data.frame(types = levels(tokens), ans,
+             check.names = FALSE, fix.empty.names = FALSE)
 }
+
+# @export
+all_measures <- function() names(builtin_disp())[- (1:12)]
+
