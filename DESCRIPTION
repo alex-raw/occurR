@@ -16,7 +16,10 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
     stats,
-    data.table,
+    collapse,
     Rcpp
-LinkingTo: 
+LinkingTo:
     Rcpp
+Suggests:
+    Rfast,
+    data.table

@@ -2,9 +2,7 @@
 
 export(available_measures)
 export(dispersion)
-export(ll_dt)
 export(ll_mini)
 export(v_assoc)
-import(data.table)
 importFrom(Rcpp,sourceCpp)
 useDynLib(occurR, .registration = TRUE)

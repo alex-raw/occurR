@@ -3,6 +3,9 @@
 .Rdata
 .httr-oauth
 .DS_Store
-blog
+blog*
 tags
-archive
+archive*
+*.o
+*.so
+*.dll

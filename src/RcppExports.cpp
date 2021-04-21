@@ -17,9 +17,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// groupsum
+NumericVector groupsum(const NumericVector& x, int ng, const IntegerVector& g);
+RcppExport SEXP _occurR_groupsum(SEXP xSEXP, SEXP ngSEXP, SEXP gSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type ng(ngSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type g(gSEXP);
+    rcpp_result_gen = Rcpp::wrap(groupsum(x, ng, g));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_occurR_factorcpp", (DL_FUNC) &_occurR_factorcpp, 2},
+    {"_occurR_groupsum", (DL_FUNC) &_occurR_groupsum, 3},
     {NULL, NULL, 0}
 };
 

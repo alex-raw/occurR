@@ -2,19 +2,9 @@
 % Please edit documentation in R/ll_compact.R
 \name{ll_mini}
 \alias{ll_mini}
-\alias{ll_dt}
 \title{Calculate G² (log-likelihood test) from vectors}
 \usage{
 ll_mini(f1, o11, n = sum(f1), f2 = sum(o11))
-
-ll_dt(
-  x,
-  n = sum(x$f1),
-  f2 = sum(x$o11),
-  fun = "ll",
-  one_sided = TRUE,
-  sorted = TRUE
-)
 }
 \arguments{
 \item{f1}{numeric or integer with frequencies of token}
@@ -26,12 +16,6 @@ sum of f1 is taken}
 
 \item{f2}{numeric or integer with frequencies of co-occurring token or construction
 if not provided, sum of joint frequencies (o11) is taken}
-
-\item{x}{data.table with named columns o11 and f1, optionally f2 and n}
-
-\item{one_sided}{logical. should repulsion be indicated by a negative sign?}
-
-\item{sorted}{logical. should output be sorted by association strength?}
 }
 \value{
 numeric

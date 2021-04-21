@@ -1,4 +1,6 @@
 ^LICENSE\.md$
 blog/
 archive/
+.github/
 ^tags$
+^\.github$
