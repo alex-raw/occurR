@@ -60,7 +60,7 @@ carroll_d2 <- function(p, p_sum, group, n, N) {
 }
 
 kromer <- function(x, group, N) {
-  if (!requireNamespace("Rfast", quietly = TRUE)) {
+  if (requireNamespace("Rfast", quietly = TRUE)) {
     return(sum_by(group, N, Rfast::Digamma(x + 1L) - Rfast::Digamma(1L)))
   }
   sum_by(group, N, digamma(x + 1L) - digamma(1L))
