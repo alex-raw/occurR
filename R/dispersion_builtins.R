@@ -1,5 +1,5 @@
 builtin_disp <- function() expression(
-  # i = token index, ids = part index
+  # i = token index, ids = part index, N = number of unique types
   ids   = as_factor(parts),
   n     = count(ids),
   sizes = sum_by(ids, n, v),
@@ -24,14 +24,14 @@ builtin_disp <- function() expression(
   D        = juilland_d(p, n, range, p_sum, i, N),
   U        = D * f,
   sd.pop   = sd_pop(v, n, range, f_mean, i, N),
-  vc.pop   = sd.pop / f_mean,
-  D.eq     = 1 - vc.pop / sqrt(n - 1L),
+  cv.pop   = sd.pop / f_mean,
+  D.eq     = 1 - cv.pop / sqrt(n - 1L),  # TODO: check for accuracy
   U.eq     = D.eq * f,
   D2       = carroll_d2(p, p_sum, i, n, N),
   Um       = (f * D2) + (1 - D2) * f_mean,
   f.R      = sum_by(i, N, sqrt(v * s))^2,
   S        = f.R / f,
-  dc       = (f_sqrt / n)^2,
+  dc       = (f_sqrt / n)^2, # BUG: something is off here
   f.R.eq   = f_sqrt^2 / n,
   S.eq     = f.R.eq / f,
   kld      = sum_by(i, N, v_rel * log2(v_rel / s)),
@@ -43,7 +43,11 @@ builtin_disp <- function() expression(
   Ur       = kromer(v, i, N)
 )
 
-sum_by <- function(f, n, x) groupsum(x, n, f) # TODO: test, try to break c++ call
+sum_by <- function(f, n, g) {
+  if (any(sapply(as.list(environment()), is.null)))
+    stop("Arguments cannot be NULL")
+  groupsum(g, n, f)
+}
 
 max_min0 <- function(x, group, n, range)
   collapse::fmax.default(x, group) -
@@ -61,9 +65,9 @@ carroll_d2 <- function(p, p_sum, group, n, N) {
 
 kromer <- function(x, group, N) {
   if (requireNamespace("Rfast", quietly = TRUE)) {
-    return(sum_by(group, N, Rfast::Digamma(x + 1L) - Rfast::Digamma(1L)))
+    return(sum_by(group, N, Rfast::Digamma(x + 1) - Rfast::Digamma(1)))
   }
-  sum_by(group, N, digamma(x + 1L) - digamma(1L))
+  sum_by(group, N, digamma(x + 1) - digamma(1))
 }
 
 sd_pop <- function(v, n, range, mean, group, N)
