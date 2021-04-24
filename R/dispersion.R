@@ -28,7 +28,7 @@ dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
 
   if (!is.null(names(fun))) names(ans) <- names(fun)
   data.frame(types = levels(tokens), ans,
-             check.names = FALSE, fix.empty.names = FALSE)
+             check.names = FALSE, fix.empty.names = FALSE, row.names = NULL)
 }
 
 # meta-helpers

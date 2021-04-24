@@ -2,15 +2,15 @@
 #'
 #' Display names of built-in measures to be used in
 #'
-#' @param type character, currently either "assoc" or "disp"
+#' @param stat character, currently either "assoc" or "disp"
 #'
 #' @export
-available_measures <- function(type) {
+available_measures <- function(stat) {
   assoc <- names(builtin_assoc())
   disp  <- names(builtin_disp())
   # Values before range are intermediate results
   i <- seq(which(disp == "range"), length(disp))
-  switch(type, assoc = assoc, disp = disp[i])
+  switch(stat, assoc = assoc, disp = disp[i])
 }
 
 count <- function(x) if (is.factor(x)) nlevels(x) else

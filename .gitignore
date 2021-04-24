@@ -9,3 +9,4 @@ archive*
 *.o
 *.so
 *.dll
+*.html

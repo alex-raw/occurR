@@ -31,7 +31,7 @@ builtin_disp <- function() expression(
   Um       = (f * D2) + (1 - D2) * f_mean,
   f.R      = sum_by(i, N, sqrt(v * s))^2,
   S        = f.R / f,
-  dc       = (f_sqrt / n)^2, # BUG: something is off here
+  dc       = (f_sqrt / n)^2 / f_mean,
   f.R.eq   = f_sqrt^2 / n,
   S.eq     = f.R.eq / f,
   kld      = sum_by(i, N, v_rel * log2(v_rel / s)),
@@ -49,9 +49,13 @@ sum_by <- function(f, n, g) {
   groupsum(g, n, f)
 }
 
-max_min0 <- function(x, group, n, range)
-  collapse::fmax.default(x, group) -
-    ifelse(range < n, 0L, collapse::fmin.default(x, group))
+max_min0 <- function(x, group, n, range) {
+  maxs <- collapse::fmax.default(x, group, use.g.names = FALSE, na.rm = FALSE)
+  mins <- collapse::fmin.default(x, group, use.g.names = FALSE, na.rm = FALSE)
+  non_zero <- range >= n
+  maxs[non_zero] <- maxs[non_zero] - mins[non_zero]
+  maxs
+}
 
 chisq0 <- function(v, s, f, group, s_sum, N) {
   f_exp <- s * f[group]
