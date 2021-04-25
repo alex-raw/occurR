@@ -4,3 +4,4 @@ archive/
 .github/
 ^tags$
 ^\.github$
+^codecov\.yml$

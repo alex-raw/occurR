@@ -1,5 +1,6 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/alex-raw/occurR/workflows/R-CMD-check/badge.svg)](https://github.com/alex-raw/occurR/actions)
+[![Codecov test coverage](https://codecov.io/gh/alex-raw/occurR/branch/main/graph/badge.svg)](https://codecov.io/gh/alex-raw/occurR?branch=main)
 <!-- badges: end -->
 
 ## occurR
