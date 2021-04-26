@@ -13,6 +13,7 @@ v <- toy$Freq
 tokens <- toy$tokens
 parts <- toy$parts
 ans1 <- dispersion(v, tokens, parts, every)
+ans1_fact <- dispersion(v, as.factor(tokens), as.factor(parts), every)
 
 #---------------------------------------------------------- brown reference
 brown_reference <- read.table("brown_reference.tsv", header = TRUE,
@@ -31,5 +32,6 @@ parts2 <- brown$parts
 
 ans2 <- dispersion(v2, tokens2, parts2, every)
 ans2 <- ans2[order(ans2$types), ]
+ans2_fact <- dispersion(v2, as.factor(tokens2), as.factor(parts2), every)
+ans2_fact <- ans2_fact[order(ans2_fact$types), ]
 rownames(ans2) <- NULL
-

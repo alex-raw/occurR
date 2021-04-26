@@ -1,3 +1,10 @@
+library("cwbwrapr")
+
+# lol <- read_freqs(
+#   "../../blog/test_data/brown_word_dist",
+#   cols = list(token = "", dist = 0L)
+# )
+
 # library(data.table)
 
 # dat <- fread("bnc_word_id_full",
