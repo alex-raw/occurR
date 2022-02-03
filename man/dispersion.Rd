@@ -7,7 +7,7 @@
 dispersion(v, tokens, parts, fun = "dp.norm", lexicon = NULL)
 }
 \arguments{
-\item{v}{integer. frequencies}
+\item{v}{integer. counts}
 
 \item{tokens}{character or factor. token}
 
