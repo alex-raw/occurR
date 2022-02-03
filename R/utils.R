@@ -13,8 +13,16 @@ available_measures <- function(stat) {
   switch(stat, assoc = assoc, disp = disp[i])
 }
 
-count <- function(x) if (is.factor(x)) nlevels(x) else
-  collapse::fNdistinct.default(x, na.rm = FALSE)
+check_funs <- function(fun, exprs) if (is.character(fun)) {
+  mismatch <- !fun %in% names(exprs)
+  if (any(mismatch)) stop(
+    "No built-in measure named: `", fun[mismatch],
+    "`; see ?available_measures"
+  )
+}
+
+count <- function(x) if (is.factor(x))
+  nlevels(x) else collapse::fndistinct.default(x, na.rm = FALSE)
 
 as_factor <- function(x, lex = NULL) {
   if (is.factor(x)) return(x)

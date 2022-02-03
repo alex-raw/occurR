@@ -15,29 +15,22 @@
 #' @details coming soon ...
 #'
 #' @export
-
 v_assoc <- function(f1, o11, f2 = NULL, n = NULL, fun = "ll") {
   if (is.null(f2)) f2 <- sum(o11)
   if (is.null(n)) n <- sum(f1)
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
-
-  if (is.character(fun)) {
-    mismatch <- fun[!fun %in% names(builtin_assoc())]
-    if (length(mismatch) > 0L) {
-      stop("No built-in association measure named: ",
-           mismatch, "; see available_measures()")
-    }
-  }
+  check_funs(fun, builtin_assoc())
 
   exprs <- switch(class(fun),
-    "expression" = fun,
     "character"  = builtin_assoc()[fun],
     "function"   = as.expression(body(fun)),
     "call"       = as.expression(fun),
+    "expression" = fun,
     stop("invalid type of `fun`: ", class(fun))
   )
 
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
+  # assert_all_numeric(input)
   vars  <- sapply(all.vars(exprs), get_assoc_vars, input, simplify = FALSE)
   out   <- vapply(exprs, eval, numeric(length(f1)), vars)
 
