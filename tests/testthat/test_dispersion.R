@@ -9,7 +9,6 @@ test_that("dispersion produces expected values, character input", {
   expect_equal(ans2, brown_reference)
 })
 
-
 test_that("dispersion produces expected values, factor input", {
   expect_equal(ans1_fact, toy_reference)
   expect_equal(ans2_fact, brown_reference)

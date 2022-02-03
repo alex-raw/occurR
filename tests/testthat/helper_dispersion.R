@@ -16,6 +16,8 @@ tokens <- toy$tokens
 parts <- toy$parts
 ans1 <- dispersion(v, tokens, parts, every)
 ans1_fact <- dispersion(v, as.factor(tokens), as.factor(parts), every)
+ans1 <- ans1[, colnames(toy_reference)]
+ans1_fact <- ans1_fact[, colnames(toy_reference)]
 
 #---------------------------------------------------------- brown reference
 brown_reference <- read_test_data("brown_reference.tsv", header = TRUE)
