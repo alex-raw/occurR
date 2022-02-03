@@ -1,20 +1,21 @@
 builtin_disp <- function() expression(
-  # i = token index, ids = part index, N = number of unique types
-  ids   = as_factor(parts),
-  n     = count(ids),
-  sizes = sum_by(ids, n, v),
+  # i = token index
+  N        = nlevels(i),              # number of unique types
+  ids      = as_factor(parts),        # part index
+  n        = count(ids),
+  sizes    = sum_by(ids, n, v),
 
-  # vectorized values               # v = count word in part
-  s      = proportions(sizes)[ids], # % part in corpus
-  p      = v / sizes[ids],          # % word in part
-  f      = sum_by(i, N, v),         # f = count word in corpus
-  v_rel  = v / f[i],
-  f_mean = f / n,
+  # vectorized values                 # v = count word in part
+  s        = proportions(sizes)[ids], # % part in corpus
+  p        = v / sizes[ids],          # % word in part
+  f        = sum_by(i, N, v),         # count word in corpus
+  v_rel    = v / f[i],
+  f_mean   = f / n,
 
   # shared values
-  p_sum  = sum_by(i, N, p),
-  s_sum  = sum_by(i, N, s),
-  f_sqrt = sum_by(i, N, sqrt(v)),
+  p_sum    = sum_by(i, N, p),
+  s_sum    = sum_by(i, N, s),
+  f_sqrt   = sum_by(i, N, sqrt(v)),
 
   # measures from Gries 2019: Analyzing dispersion
   range    = tabulate(i),
@@ -25,7 +26,7 @@ builtin_disp <- function() expression(
   U        = D * f,
   sd.pop   = sd_pop(v, n, range, f_mean, i, N),
   cv.pop   = sd.pop / f_mean,
-  D.eq     = 1 - cv.pop / sqrt(n - 1L),  # TODO: check for accuracy
+  D.eq     = 1 - cv.pop / sqrt(n - 1L),
   U.eq     = D.eq * f,
   D2       = carroll_d2(p, p_sum, i, n, N),
   Um       = (f * D2) + (1 - D2) * f_mean,
@@ -68,10 +69,9 @@ carroll_d2 <- function(p, p_sum, group, n, N) {
 }
 
 kromer <- function(x, group, N) {
-  if (requireNamespace("Rfast", quietly = TRUE)) {
-    return(sum_by(group, N, Rfast::Digamma(x + 1) - Rfast::Digamma(1)))
-  }
-  sum_by(group, N, digamma(x + 1) - digamma(1))
+  digamma_ <- if (requireNamespace("Rfast", quietly = TRUE))
+    Rfast::Digamma else digamma
+  sum_by(group, N, digamma_(x + 1) - digamma_(1))
 }
 
 sd_pop <- function(v, n, range, mean, group, N)

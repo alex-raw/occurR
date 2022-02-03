@@ -1,6 +1,6 @@
 #' Calculate word dispersion measures
 #'
-#' @param v integer. frequencies
+#' @param v integer. counts
 #' @param tokens character or factor. token
 #' @param parts character or factor.
 #' part id where a part is usually text or text region.
@@ -10,37 +10,35 @@
 #'
 #' @export
 dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
-  stopifnot(identical(length(v), length(tokens), length(parts)))
-  if (anyNA(v)) stop("NA values need to be removed or set to 0.")
+  check_funs(fun, builtin_disp())
+  stopifnot(is.numeric(v),
+    is.character(tokens) || is.factor(tokens) || is.numeric(tokens),
+    is.character(parts)  || is.factor(parts) || is.numeric(parts),
+    identical(length(v), length(tokens), length(parts))
+  )
 
+  # TODO: implement expression or function input like in assoc.R
+
+  # TODO: check what happens if v = 0. might get non-sensical results
+  v      <- na.fail(as.numeric(v))
   tokens <- as_factor(tokens, lexicon)
-  input <- list(v = v, i = tokens, parts = parts, N = nlevels(tokens))
-
-  exprs <- builtin_disp()
-  # TODO: implement expression or function input as in assoc.R
-
-  if (is.character(fun) &
-      length(mismatch <- fun[!fun %in% names(exprs)]) > 0L)
-    stop("No built-in measure named: ", mismatch,
-         "; see available_measures(\"disp\")")
-
-  ans <- calculate_disp(input, fun, exprs)[c("f", fun)]
+  x      <- list(parts = parts, i = tokens, v = v)
+  ans    <- calculate_disp(x, fun = fun)[c("f", fun)]
 
   if (!is.null(names(fun))) names(ans) <- names(fun)
-  data.frame(types = levels(tokens), ans,
-             check.names = FALSE, fix.empty.names = FALSE, row.names = NULL)
+  data.frame(types = levels(tokens), ans)
 }
 
-# meta-helpers
-recurse_vars <- function(fun, exprs)
-  if (identical(fun, out <- union(all.vars(exprs[fun]), fun)))
-    return(out) else recurse_vars(out, exprs)
+gather_vars <- function(fun, exprs) {
+  out <- union(all.vars(exprs[fun]), fun)
+  if (identical(fun, out))
+    out else gather_vars(out, exprs)
+}
 
-calculate_disp <- function(start_vals, fun, exprs = builtin_disp()) {
-  fun <- intersect(recurse_vars(fun, exprs), names(exprs))
+calculate_disp <- function(x, fun, exprs = builtin_disp()) {
+  fun <- intersect(gather_vars(fun, exprs), names(exprs))
   exprs <- exprs[fun]
-  start_vals[fun] <- 0L
-  for (i in names(exprs))
-    start_vals[[i]] <- eval(exprs[[i]], start_vals)
-  start_vals
+  x[fun] <- 0L
+  for (i in names(exprs)) x[[i]] <- eval(exprs[[i]], x)
+  x
 }
