@@ -10,3 +10,4 @@ archive*
 *.so
 *.dll
 *.html
+Session.vim

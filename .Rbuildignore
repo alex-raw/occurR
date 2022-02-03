@@ -5,3 +5,4 @@ archive/
 ^tags$
 ^\.github$
 ^codecov\.yml$
+Session.vim
