@@ -1,6 +1,6 @@
-every <- Filter(function(x) x != "kld.norm", available_measures("disp"))
+every <- Filter(\(x) x != "kld.norm", available_measures("disp"))
 read_test_data <- function(path, ...)
-  read.table(path, sep = "\t", na = "", quote = "", ...)
+  utils::read.table(path, sep = "\t", na = "", quote = "", ...)
 
 #---------------------------------------------------------- toy reference
 toy_reference <- read_test_data("toy_reference.tsv", header = TRUE)
