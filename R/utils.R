@@ -1,15 +1,16 @@
 #' Builtin measures
 #'
-#' Display names of built-in measures to be used in
+#' Display names of built-in measures
 #'
 #' @param stat character, currently either "assoc" or "disp"
 #'
 #' @export
-available_measures <- function(stat) {
+available_measures <- function(stat = NULL) {
   assoc <- names(builtin_assoc())
   disp  <- names(builtin_disp())
   # Values before range are intermediate results
   i <- seq(which(disp == "range"), length(disp))
+  if (is.null(stat)) return(list(assoc = assoc, disp = disp[i]))
   switch(stat, assoc = assoc, disp = disp[i])
 }
 
@@ -21,8 +22,10 @@ check_funs <- function(fun, exprs) if (is.character(fun)) {
   )
 }
 
-count <- function(x) if (is.factor(x))
-  nlevels(x) else collapse::fndistinct.default(x, na.rm = FALSE)
+count <- function(x) {
+  if (is.factor(x)) return(nlevels(x))
+  collapse::fndistinct.default(x, na.rm = FALSE)
+}
 
 as_factor <- function(x, lex = NULL) {
   if (is.factor(x)) return(x)
@@ -35,8 +38,6 @@ make_one_sided <- function(assoc, o11, e11) {
   assoc[repulsed] <- -assoc[repulsed]
   assoc
 }
-
-zscore <- function(o11, e11) (o11 - e11) / sqrt(e11)
 
 # maths helper functions, cf. UCS/R
 reg_gamma_inv <- function(a, y, lower = TRUE, log = FALSE) {

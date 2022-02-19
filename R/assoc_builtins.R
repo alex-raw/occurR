@@ -28,27 +28,37 @@ builtin_assoc <- function() expression(
 
 # get vectors of values in a contingency table,
 get_assoc_vars <- function(x, input) with(input, switch(x,
-  n = n, f1 = f1, f2 = f2, o11 = o11,
-  r1  = f1, c1  = f2, r2  = n - f1, c2  = n - f2,
-  o12 = f2 - o11,
-  o21 = f1 - o11,
-  o22 = n - f1 - f2 + o11,
-  e11 = f1 * f2 / n,
-  e12 = (n - f1) * f2 / n,
-  e21 = (n - f2) * f1 / n,
-  e22 = (n - f1) * (n - f2) / n,
-  o   = get_obs(f1, f2, o11, n),
-  e   = get_exp(f1, f2, o11, n),
+  n     = n,
+  f1    = f1,
+  f2    = f2,
+  o11   = o11,
+  r1    = f1,
+  c1    = f2,
+  r2    = n - f1,
+  c2    = n - f2,
+  o12   = f2 - o11,
+  o21   = f1 - o11,
+  o22   = n - f1 - f2 + o11,
+  e11   = f1 * f2 / n,
+  e12   = (n - f1) * f2 / n,
+  e21   = (n - f2) * f1 / n,
+  e22   = (n - f1) * (n - f2) / n,
+  o     = get_obs(f1, f2, o11, n),
+  e     = get_exp(f1, f2, o11, n),
   alpha = 2,
   stop(paste0("No built-in way to calculate `", arg, "`."))
 ))
 
 get_obs <- function(f1, f2, o11, n) cbind(
-  o11, o12 = f2 - o11,
-  o21 = f1 - o11, o22 = n - f1 - f2 + o11
+  o11,
+  o12 = f2 - o11,
+  o21 = f1 - o11,
+  o22 = n - f1 - f2 + o11
 )
 
-get_exp <- function(f1, f2, o11, n) cbind(
-  e11 = f1 * f2 / n, e12 = (n - f1) * f2 / n,
-  e21 = (n - f2) * f1 / n, e22 = (n - f1) * (n - f2) / n
+get_exp <- function(f1, f2, n) cbind(
+  e11 = f1 * f2 / n,
+  e12 = (n - f1) * f2 / n,
+  e21 = (n - f2) * f1 / n,
+  e22 = (n - f1) * (n - f2) / n
 )

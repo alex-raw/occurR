@@ -1,7 +1,11 @@
 test_that("available_measures returns correctly", {
   expect_type(available_measures("disp"), "character")
+  expect_type(available_measures("assoc"), "character")
+  expect_true(all(c("ll", "mi", "gmean") %in% available_measures("assoc")))
+  expect_true(all(c("dp", "dp.norm") %in% available_measures("disp")))
   expect_identical(available_measures("disp")[1], "range")
-  expect_error(available_measures())
+  expect_type(available_measures(), "list")
+  expect_length(available_measures(), 2)
 })
 
 
@@ -39,4 +43,10 @@ test_that("sum_by handles missing values", {
   n <- c(1, 2, NA, 4, 5)
   u <- length(unique(x))
   expect_identical(sum_by(x, u, n), as.vector(rowsum(n, x)))
+})
+
+test_that("incompatible functions throw error", {
+  expect_null(check_funs(sum))
+  expect_error(check_funs("nope"))
+  expect_error(check_funs("logl"))
 })

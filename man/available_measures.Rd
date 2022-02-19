@@ -4,11 +4,11 @@
 \alias{available_measures}
 \title{Builtin measures}
 \usage{
-available_measures(stat)
+available_measures(stat = NULL)
 }
 \arguments{
 \item{stat}{character, currently either "assoc" or "disp"}
 }
 \description{
-Display names of built-in measures to be used in
+Display names of built-in measures
 }

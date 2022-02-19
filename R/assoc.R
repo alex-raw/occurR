@@ -21,6 +21,9 @@ v_assoc <- function(f1, o11, f2 = NULL, n = NULL, fun = "ll") {
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
   check_funs(fun, builtin_assoc())
 
+  if (any(o11 > f1) || any(o11 > f2) || any(o11 > n))
+    warning("Some observed frequencies are too large")
+
   exprs <- switch(class(fun),
     "character"  = builtin_assoc()[fun],
     "function"   = as.expression(body(fun)),
