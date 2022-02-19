@@ -5,8 +5,8 @@ Authors@R:
     person(given = "Alexander",
            family = "Rauhut",
            role = c("aut", "cre"),
-           email = "alexraw@mailbox.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "alexraw@mailbox.com"
+           )
 URL: www.alexraw.xyz
 Description: Tools to calculate association and dispersion measures from various types of word frequency data.
 License: GPL (>= 3)
