@@ -37,3 +37,11 @@ test_that("modular values are same as individual ones", {
     ignore_attr = TRUE
   )
 })
+
+test_that("bare-bones functions return same as main functions", {
+  o11 <- sample(1:100, 20)
+  f1 <- o11 + sample(1:100, 20)
+  expect_identical(ll(f1, o11, one_sided = FALSE),
+                   c(v_assoc(f1, o11, fun = "ll")),
+                   ignore_attr = FALSE)
+})

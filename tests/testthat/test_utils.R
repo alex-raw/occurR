@@ -13,11 +13,17 @@ test_that("as_factor same as returns an unordered variant of base::factor", {
   x <- sample(letters, 50, replace = TRUE)
   expect_identical(levels(factor(x, unique(x))), levels(as_factor(x)))
   expect_identical(as.integer(factor(x, unique(x))), as.integer(as_factor(x)))
+  expect_identical(as.factor(1:10), as_factor(1:10))
+  expect_identical(as.factor(1:10), as_factor(1:10, 1:10))
+  expect_identical(as.factor(1.1:10), as_factor(1.1:10, 1.1:10))
 })
 
-test_that("as_factor handles NA", {
+test_that("as_factor handles special values", {
   x <- c("a", NA, "a", NA, "b")
   expect_identical(as_factor(x), factor(x, unique(x), exclude = NULL))
+  y <- c("a", NaN, "a", NaN, "b")
+  expect_identical(as_factor(y), factor(y, unique(y), exclude = NULL))
+  expect_null(factorcpp(NA, letters))
 })
 
 
