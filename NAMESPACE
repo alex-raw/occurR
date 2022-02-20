@@ -2,7 +2,7 @@
 
 export(available_measures)
 export(dispersion)
-export(ll_mini)
+export(ll)
 export(v_assoc)
 importFrom(Rcpp,sourceCpp)
 useDynLib(occurR, .registration = TRUE)

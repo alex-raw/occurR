@@ -4,7 +4,7 @@
 \alias{v_assoc}
 \title{Vectorized calculation of association measures}
 \usage{
-v_assoc(f1, o11, f2 = NULL, n = NULL, fun = "ll")
+v_assoc(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll")
 }
 \arguments{
 \item{f1}{numeric}
