@@ -44,7 +44,7 @@ get_assoc_vars <- function(x, input) with(input, switch(x,
   e21   = (n - f2) * f1 / n,
   e22   = (n - f1) * (n - f2) / n,
   o     = get_obs(f1, f2, o11, n),
-  e     = get_exp(f1, f2, o11),
+  e     = get_exp(f1, f2, n),
   alpha = 2,
   stop(paste0("No built-in way to calculate `", arg, "`."))
 ))
@@ -57,8 +57,8 @@ get_obs <- function(f1, f2, o11, n) cbind(
 )
 
 get_exp <- function(f1, f2, n) cbind(
-  e11 = f1 * f2 / n,
-  e12 = (n - f1) * f2 / n,
-  e21 = (n - f2) * f1 / n,
-  e22 = (n - f1) * (n - f2) / n
-)
+  e11 = f1 * f2,
+  e12 = (n - f1) * f2,
+  e21 = (n - f2) * f1,
+  e22 = (n - f1) * (n - f2)
+) / n
