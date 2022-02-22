@@ -1,4 +1,4 @@
-#' Vectorized calculation of association measures
+#'  Association measures for collocation and collostruction
 #'
 #' Calculates association measures from vectors of frequencies and
 #' joint frequencies.
@@ -15,7 +15,7 @@
 #' @details coming soon ...
 #'
 #' @export
-v_assoc <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
+coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
   check_funs(fun, builtin_assoc())
 
@@ -30,6 +30,8 @@ v_assoc <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
     stop("invalid type of `fun`: ", class(fun))
   )
 
+  # out <- UseMethod("coll")
+
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
   vars <- sapply(all.vars(exprs), get_assoc_vars, input, simplify = FALSE)
   out <- vapply(exprs, eval, numeric(length(f1)), vars)
@@ -38,30 +40,3 @@ v_assoc <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   if (!is.null(names(fun))) colnames(out) <- names(fun)
   out
 }
-
-coll <- function(x, o11 = NULL, n = NULL, f2 = NULL,
-                 fun = "ll", decreasing = TRUE, one_sided = FALSE) {
-  # generic function coming here (data.frames, matrix, data.tables)
-}
-
-
-# # TODO: data.table method?
-# ll_dt <- function(x, n = sum(x$f1), f2 = sum(x$o11), fun = "ll",
-#                   one_sided = TRUE, sorted = TRUE) {
-#
-#   if (!requireNamespace("data.table", quietly = TRUE)) {
-#     stop("Package \"data.table\" needed for this function to work. Please install it.",
-#          call. = FALSE)
-#   }
-#
-#   datatable.aware = TRUE
-#   `:=` <- data.table::`:=`
-#
-#   # TODO: matrix output doesn't work
-#   x[, (fun) := data.frame(v_assoc(f1, o11, f2, n, fun))]
-#   if (isTRUE(one_sided)) x[o11 < e11, `:=`(assoc, -assoc)]
-#   if (isTRUE(sorted)) data.table::setorder(x, -assoc)
-# }
-#
-# # due to NSE notes in R CMD check
-# o11 <- f1 <- assoc <- e11 <- NULL

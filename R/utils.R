@@ -14,12 +14,15 @@ available_measures <- function(stat = NULL) {
   switch(stat, assoc = assoc, disp = disp[i])
 }
 
-check_funs <- function(fun, exprs) if (is.character(fun)) {
-  mismatch <- !fun %in% names(exprs)
-  if (any(mismatch)) stop(
-    "No built-in measure named: `", fun[mismatch],
-    "`; see ?available_measures"
-  )
+check_funs <- function(fun, exprs) {
+  if (is.character(fun)) {
+    mismatch <- !fun %in% names(exprs)
+    if (any(mismatch)) stop(
+      "No built-in measure named: `",
+      fun[mismatch],
+      "`; see ?available_measures"
+    )
+  }
 }
 
 count <- function(x) {
