@@ -1,7 +1,9 @@
 test_that("assoc builtins", {
   expect_type(builtin_assoc(), "expression")
-  result <- eval(builtin_assoc()["ll"],
-                 list(o = matrix(11:20, 2), e = matrix(1:10, 2)))
+  result <- eval(builtin_assoc()["ll"], list(
+    o = matrix(11:20, 2),
+    e = matrix(1:10, 2)
+  ))
   expect_true(is.numeric(result))
   expect_length(result, 2)
 })
@@ -42,6 +44,7 @@ test_that("bare-bones functions return same as main functions", {
   o11 <- sample(1:100, 20)
   f1 <- o11 + sample(1:100, 20)
   expect_identical(ll(f1, o11, one_sided = FALSE),
-                   c(coll(f1, o11, fun = "ll")),
-                   ignore_attr = FALSE)
+    c(coll(f1, o11, fun = "ll")),
+    ignore_attr = FALSE
+  )
 })

@@ -5,19 +5,21 @@
 #' @param stat character, currently either "assoc" or "disp"
 #'
 #' @export
-available_measures <- function(stat = NULL) {
+available_measures <- function(stat = "") {
   assoc <- names(builtin_assoc())
-  disp  <- names(builtin_disp())
+  disp <- names(builtin_disp())
   # Values before range are intermediate results
   i <- seq(which(disp == "range"), length(disp))
-  if (is.null(stat)) return(list(assoc = assoc, disp = disp[i]))
-  switch(stat, assoc = assoc, disp = disp[i])
+  switch(stat,
+    assoc = assoc,
+    disp = disp[i],
+    list(assoc = assoc, disp = disp[i])
+  )
 }
 
 check_funs <- function(fun, exprs) {
-  if (is.character(fun)) {
-    mismatch <- !fun %in% names(exprs)
-    if (any(mismatch)) stop(
+  if (is.character(fun) && any(mismatch <- !fun %in% names(exprs))) {
+    stop(
       "No built-in measure named: `",
       fun[mismatch],
       "`; see ?available_measures"
@@ -26,12 +28,16 @@ check_funs <- function(fun, exprs) {
 }
 
 count <- function(x) {
-  if (is.factor(x)) return(nlevels(x))
+  if (is.factor(x)) {
+    return(nlevels(x))
+  }
   collapse::fndistinct.default(x, na.rm = FALSE)
 }
 
 as_factor <- function(x, lex = NULL) {
-  if (is.factor(x)) return(x)
+  if (is.factor(x)) {
+    return(x)
+  }
   if (is.null(lex)) lex <- collapse::funique(x)
   factorcpp(x, lex)
 }

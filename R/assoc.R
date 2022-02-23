@@ -19,8 +19,9 @@ coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
   check_funs(fun, builtin_assoc())
 
-  if (any(o11 > f1) || any(o11 > f2) || any(o11 > n))
+  if (any(o11 > f1) || any(o11 > f2) || any(o11 > n)) {
     stop("Joint frequencies cannot be larger than individual counts")
+  }
 
   exprs <- switch(class(fun),
     "character"  = builtin_assoc()[fun],
@@ -40,3 +41,21 @@ coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   if (!is.null(names(fun))) colnames(out) <- names(fun)
   out
 }
+
+coll.default <- function() {
+}
+
+coll.data.frame <- function() {
+}
+
+coll.data.table <- function() {
+  if (!requireNamespace("data.table", quietly = TRUE)) {
+    stop("Package \"data.table\" needed for this function to work. Please install it.",
+      call. = FALSE
+    )
+  }
+  # datatable.aware <- TRUE
+}
+
+# due to NSE notes in R CMD check
+o11 <- f1 <- assoc <- e11 <- NULL
