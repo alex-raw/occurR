@@ -4,7 +4,7 @@
 \alias{available_measures}
 \title{Builtin measures}
 \usage{
-available_measures(stat = NULL)
+available_measures(stat = "")
 }
 \arguments{
 \item{stat}{character, currently either "assoc" or "disp"}
