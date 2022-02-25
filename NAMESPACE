@@ -3,6 +3,7 @@
 export(available_measures)
 export(coll)
 export(dispersion)
+export(dwg)
 export(ll)
 importFrom(Rcpp,sourceCpp)
 useDynLib(occurR, .registration = TRUE)
