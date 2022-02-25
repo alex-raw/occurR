@@ -56,3 +56,10 @@ test_that("incompatible functions throw error", {
   expect_error(check_funs("nope"))
   expect_error(check_funs("logl"))
 })
+
+test_that("count", {
+  x <- c(letters, letters)
+  expect_identical(count(x), count(factor(x)))
+  expect_length(count(x), 1)
+  expect_true(is.numeric(count(x)))
+})
