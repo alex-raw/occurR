@@ -21,6 +21,7 @@ dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
   # TODO: implement expression or function input like in assoc.R
 
   # TODO: check what happens if v = 0. might get non-sensical results
+
   v <- stats::na.fail(as.numeric(v))
   tokens <- as_factor(tokens, lexicon)
   x <- list(parts = parts, i = tokens, v = v)

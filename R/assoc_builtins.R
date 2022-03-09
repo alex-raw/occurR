@@ -17,9 +17,9 @@ builtin_assoc <- function() {
     zscore_cor = zscore(ifelse(o11 > e11, o11 - 0.5, o11 + 0.5), e11),
     chisq = (n * ((o11 - e11)^2)) / (e11 * e22),
     chisq_i = rowSums(((o - e)^2) / e, na.rm = TRUE),
-    chisq_h = (n * (o11 * o22 - o12 * o21)^2) / (r1 * r2 * c1 * c2),
+    chisq_h = n * (o11 * o22 - o12 * o21)^2 / prod(r1, r2, c1, c2),
     chisq_corr = (n * (abs(o11 * o22 - o12 * o21) - n / 2)^2) /
-      (r1 * r2 * c1 * c2),
+      prod(r1, r2, c1, c2),
     min_sens = ifelse((o11 / r1) < (o11 / c1), o11 / r1, o11 / c1),
     poisson_stirling = o11 * (log10(o11) - log10(e11) - 1),
     odds_ratio = {
@@ -56,7 +56,7 @@ get_assoc_vars <- function(x, input) {
 
 get_obs <- function(f1, f2, o11, n) {
   cbind(
-    o11,
+    o11 = o11,
     o12 = f2 - o11,
     o21 = f1 - o11,
     o22 = n - f1 - f2 + o11

@@ -35,19 +35,19 @@ coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   out
 }
 
-coll.default <- function() {
+coll.default <- function() { # nolint
 }
 
-coll.data.frame <- function() {
+coll.data.frame <- function() { # nolint
 }
 
-coll.data.table <- function() {
+coll.data.table <- function() { # nolint
   if (!requireNamespace("data.table", quietly = TRUE)) {
-    stop("Package \"data.table\" needed for this function to work. Please install it.",
-      call. = FALSE
+    stop("Package \"data.table\" needed for this function to work.
+         Please install it.", call. = FALSE
     )
   }
-  # datatable.aware <- TRUE
+  datatable.aware <- TRUE # nolint
 }
 
 # due to NSE notes in R CMD check

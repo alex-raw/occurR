@@ -3,8 +3,8 @@
 #' Calculate loglikelihood association measures for vectors of counts.
 #'
 #' @param o11 numeric or integer with joint frequency
-#' @param f1 numeric or integer with frequencies of token
-#' @param f2 numeric or integer with frequencies of co-occurring token or
+#' @param f1 numeric or integer with frequencies of tokens
+#' @param f2 numeric or integer with frequencies of co-occurring tokens or
 #' construction if not provided, sum of joint frequencies (o11) is taken
 #' @param n numeric or integer with overall frequencies if not provided,
 #' sum of f1 is taken
