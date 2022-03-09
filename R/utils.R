@@ -27,6 +27,16 @@ check_funs <- function(fun, exprs) {
   }
 }
 
+get_fun <- function(fun) {
+  switch(class(fun),
+    "character"  = builtin_assoc()[fun],
+    "function"   = as.expression(body(fun)),
+    "call"       = as.expression(fun),
+    "expression" = fun,
+    stop("invalid type of `fun`: ", class(fun))
+  )
+}
+
 count <- function(x) {
   if (is.factor(x)) {
     return(nlevels(x))

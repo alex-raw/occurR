@@ -18,18 +18,11 @@
 coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
   check_funs(fun, builtin_assoc())
+  exprs <- get_fun(fun)
 
   if (any(o11 > f1) || any(o11 > f2) || any(o11 > n)) {
     stop("Joint frequencies cannot be larger than individual counts")
   }
-
-  exprs <- switch(class(fun),
-    "character"  = builtin_assoc()[fun],
-    "function"   = as.expression(body(fun)),
-    "call"       = as.expression(fun),
-    "expression" = fun,
-    stop("invalid type of `fun`: ", class(fun))
-  )
 
   # out <- UseMethod("coll")
 
