@@ -17,22 +17,30 @@
 #' @export
 coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
-  check_funs(fun, builtin_assoc())
-  exprs <- get_fun(fun)
 
   if (any(o11 > f1) || any(o11 > f2) || any(o11 > n)) {
     stop("Joint frequencies cannot be larger than individual counts")
   }
 
-  # out <- UseMethod("coll")
-
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
-  vars <- sapply(all.vars(exprs), get_assoc_vars, input, simplify = FALSE)
-  out <- vapply(exprs, eval, numeric(length(f1)), vars)
+  out <- tryCatch(
+    run_coll_funs(input, fun),
+    warning = function(w) {
+      run_coll_funs(lapply(input, as.numeric), fun)
+    }
+  )
+
+  # TODO: sign swap if one-sided
 
   if (is.function(fun)) colnames(out) <- deparse(substitute(fun))
   if (!is.null(names(fun))) colnames(out) <- names(fun)
   out
+}
+
+run_coll_funs <- function(input, fun) {
+  exprs <- get_assoc_fun(fun)
+  vars <- sapply(all.vars(exprs), get_assoc_vars, input, simplify = FALSE)
+  vapply(exprs, eval, numeric(length(input$f1)), vars)
 }
 
 coll.default <- function() { # nolint

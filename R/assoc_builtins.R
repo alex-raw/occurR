@@ -50,7 +50,7 @@ get_assoc_vars <- function(x, input) {
     o     = get_obs(f1, f2, o11, n),
     e     = get_exp(f1, f2, n),
     alpha = 2,
-    stop(sprintf("No built-in way to calculate `%s`.", arg))
+    stop(sprintf("No built-in way to calculate `%s`.", x))
   ))
 }
 

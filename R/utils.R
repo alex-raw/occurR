@@ -27,7 +27,8 @@ check_funs <- function(fun, exprs) {
   }
 }
 
-get_fun <- function(fun) {
+get_assoc_fun <- function(fun) {
+  check_funs(fun, builtin_assoc())
   switch(class(fun),
     "character"  = builtin_assoc()[fun],
     "function"   = as.expression(body(fun)),
