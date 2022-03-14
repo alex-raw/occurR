@@ -1,0 +1,12 @@
+citHeader("To cite 'occurR' in publications use:")
+
+citEntry(
+  entry    = "Misc",
+  title    = "occurR: Lexical Statistics in R",
+  author   = "Alexander Rauhut",
+  year     = "2022",
+  textVersion = paste(
+    "Rauhut, Alexander. 2022.",
+    "occurR: Lexical Statistics in R"
+  )
+)
