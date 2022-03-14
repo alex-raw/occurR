@@ -48,3 +48,17 @@ test_that("bare-bones functions return same as main functions", {
     ignore_attr = FALSE
   )
 })
+
+test_that("doesn't allow o11 > f1/f2", {
+  expect_error(coll(1, 2, 1, 1))
+  expect_error(coll(1, 2, 2, 1))
+  expect_error(coll(2, 2, 2, 1))
+})
+
+
+test_that("treat impossible input values", {
+  # TODO: produces NaN -> Inf in ll
+  expect_error(coll(1, 0, 1, 1))
+  expect_error(coll(12, 0, 12, 12))
+  expect_error(coll(c(12, 13), 0, 12, 12)) # different lengths
+})

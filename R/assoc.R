@@ -17,10 +17,13 @@
 #' @export
 coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
+  stopifnot(identical(length(f1), length(o11)))
 
   if (any(o11 > f1) || any(o11 > f2) || any(o11 > n)) {
     stop("Joint frequencies cannot be larger than individual counts")
   }
+
+  # TODO: na.rm
 
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
   out <- tryCatch(
