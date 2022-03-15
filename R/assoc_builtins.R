@@ -12,7 +12,7 @@ builtin_assoc <- function() {
     lidell = (n * (o11 - e11)) / (c1 * c2),
     gmean = o11 / sqrt(n * e11),
     dice = (2 * o11) / (r1 + c1),
-    jaccard = o10 / (o11 + o12 + o21),
+    jaccard = o11 / (o11 + o12 + o21),
     zscore = (o11 - e11) / sqrt(e11),
     zscore_cor = zscore(ifelse(o11 > e11, o11 - 0.5, o11 + 0.5), e11),
     chisq = (n * ((o11 - e11)^2)) / (e11 * e22),
@@ -71,3 +71,5 @@ get_exp <- function(f1, f2, n) {
     e22 = (n - f1) * (n - f2)
   ) / n
 }
+
+zscore <- \(o11, e11) (o11 - e11) / sqrt(e11)

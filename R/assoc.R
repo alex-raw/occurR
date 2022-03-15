@@ -39,8 +39,10 @@ coll <- function(f1, o11, f2 = sum(o11), n = NULL, fun = "ll") {
 
   # TODO: sign swap if one-sided
 
-  if (is.function(fun)) colnames(out) <- deparse(substitute(fun))
-  if (!is.null(names(fun))) colnames(out) <- names(fun)
+  if (is.matrix(out)) {
+    if (is.function(fun)) colnames(out) <- deparse(substitute(fun))
+    if (!is.null(names(fun))) colnames(out) <- names(fun)
+  }
   out
 }
 
