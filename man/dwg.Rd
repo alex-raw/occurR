@@ -23,7 +23,7 @@ numeric
 A distance-based dispersion measure
 }
 \details{
-TODO
+TODO:
 }
 \examples{
 dwg(c(41, 32, 41, 12), f = 4, size = 100)

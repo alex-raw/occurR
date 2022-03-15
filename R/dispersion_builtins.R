@@ -61,17 +61,17 @@ max_min0 <- function(x, group, n, range) {
   maxs
 }
 
-chisq0 <- function(v, s, f, group, s_sum, N) {
+chisq0 <- function(v, s, f, group, s_sum, N) { # nolint
   f_exp <- s * f[group]
   ((1 - s_sum) * f) + sum_by(group, N, (v - f_exp)^2 / f_exp)
 }
 
-carroll_d2 <- function(p, p_sum, group, n, N) {
+carroll_d2 <- function(p, p_sum, group, n, N) { # nolint
   x <- p / p_sum[group]
   -sum_by(group, N, x * log2(x)) / log2(n)
 }
 
-kromer <- function(x, group, N) {
+kromer <- function(x, group, N) { # nolint
   digamma_ <- if (requireNamespace("Rfast", quietly = TRUE)) {
     Rfast::Digamma
   } else {
@@ -80,11 +80,11 @@ kromer <- function(x, group, N) {
   sum_by(group, N, digamma_(x + 1) - digamma_(1))
 }
 
-sd_pop <- function(v, n, range, mean, group, N) {
+sd_pop <- function(v, n, range, mean, group, N) { # nolint
   sqrt((sum_by(group, N, (v - mean[group])^2) + ((n - range) * mean^2)) / n)
 }
 
-juilland_d <- function(p, n, range, p_sum, group, N) {
+juilland_d <- function(p, n, range, p_sum, group, N) { # nolint
   p_mean <- p_sum / n
   1 - sd_pop(p, n, range, p_mean, group, N) / p_mean / sqrt(n - 1L)
 }

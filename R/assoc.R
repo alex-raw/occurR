@@ -1,10 +1,10 @@
-#'  Association measures for collocation and collostruction
+#' Association measures for collocation and collostruction
 #'
 #' Calculates association measures from vectors of frequencies and
 #' joint frequencies.
 #'
-#' @param f1 numeric
-#' @param o11 numeric joint frequencies
+#' @param f1 numeric vector
+#' @param o11 numeric vector with joint frequencies
 #' @param f2 numeric, if not provided, sum of o11 is used
 #' @param n numeric, if not provided, sum of f1 is used
 #' @param fun character vector for built-in measures (see Details).
@@ -12,7 +12,7 @@
 #' they are used in the output
 #'
 #' @return matrix
-#' @details coming soon ...
+#' @details TODO:
 #'
 #' @export
 coll <- function(f1, o11, f2 = sum(o11), n = NULL, fun = "ll") {

@@ -4,17 +4,17 @@
 \alias{ll}
 \title{Calculate G² (log-likelihood test) from vectors}
 \usage{
-ll(f1, o11, n = sum(f1), f2 = sum(o11), one_sided = TRUE)
+ll(f1, o11, n = sum(f1 + f2), f2 = sum(o11), one_sided = TRUE)
 }
 \arguments{
-\item{f1}{numeric or integer with frequencies of token}
+\item{f1}{numeric or integer with frequencies of tokens}
 
 \item{o11}{numeric or integer with joint frequency}
 
 \item{n}{numeric or integer with overall frequencies if not provided,
 sum of f1 is taken}
 
-\item{f2}{numeric or integer with frequencies of co-occurring token or
+\item{f2}{numeric or integer with frequencies of co-occurring tokens or
 construction if not provided, sum of joint frequencies (o11) is taken}
 
 \item{one_sided}{logical if \code{TRUE}, repulsion is indicated by a negative sign}

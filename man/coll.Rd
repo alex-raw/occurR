@@ -4,12 +4,12 @@
 \alias{coll}
 \title{Association measures for collocation and collostruction}
 \usage{
-coll(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll")
+coll(f1, o11, f2 = sum(o11), n = NULL, fun = "ll")
 }
 \arguments{
-\item{f1}{numeric}
+\item{f1}{numeric vector}
 
-\item{o11}{numeric joint frequencies}
+\item{o11}{numeric vector with joint frequencies}
 
 \item{f2}{numeric, if not provided, sum of o11 is used}
 
@@ -27,5 +27,5 @@ Calculates association measures from vectors of frequencies and
 joint frequencies.
 }
 \details{
-coming soon ...
+TODO:
 }
