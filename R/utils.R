@@ -18,24 +18,13 @@ available_measures <- function(stat = "") {
 }
 
 check_funs <- function(fun, exprs) {
-  if (is.character(fun) && any(mismatch <- !fun %in% names(exprs))) {
+  if (any(mismatch <- !fun %in% names(exprs))) {
     stop(
       "No built-in measure named: `",
       fun[mismatch],
       "`; see ?available_measures"
     )
   }
-}
-
-get_assoc_fun <- function(fun) {
-  check_funs(fun, builtin_assoc())
-  switch(class(fun),
-    "character"  = builtin_assoc()[fun],
-    "function"   = as.expression(body(fun)),
-    "call"       = as.expression(fun),
-    "expression" = fun,
-    stop("invalid type of `fun`: ", class(fun))
-  )
 }
 
 count <- function(x) {

@@ -39,17 +39,16 @@ coll <- function(f1, o11, f2 = sum(o11), n = NULL, fun = "ll") {
 
   # TODO: sign swap if one-sided
 
-  if (is.matrix(out)) {
-    if (is.function(fun)) colnames(out) <- deparse(substitute(fun))
-    if (!is.null(names(fun))) colnames(out) <- names(fun)
-  }
   out
 }
 
 run_coll_funs <- function(input, fun) {
-  exprs <- get_assoc_fun(fun)
-  vars <- sapply(all.vars(exprs), get_assoc_vars, input, simplify = FALSE)
-  vapply(exprs, eval, numeric(length(input$f1)), vars)
+  if (is.character(fun)) {
+    check_funs(fun, builtin_assoc())
+    fun <- builtin_assoc()[fun]
+  }
+  vars <- sapply(all.vars(fun), get_assoc_vars, input, simplify = FALSE)
+  vapply(fun, eval, numeric(length(input$f1)), vars)
 }
 
 coll.default <- function() { # nolint

@@ -52,9 +52,8 @@ test_that("sum_by handles missing values", {
 })
 
 test_that("incompatible functions throw error", {
-  expect_null(check_funs(sum))
-  expect_error(check_funs("nope"))
-  expect_error(check_funs("logl"))
+  expect_error(check_funs("nope", builtin_assoc()))
+  expect_error(check_funs("logl", builtin_assoc()))
 })
 
 test_that("count", {
