@@ -15,7 +15,11 @@
 #' @details coming soon ...
 #'
 #' @export
-coll <- function(f1, o11, f2 = sum(o11), n = sum(f1), fun = "ll") {
+coll <- function(f1, o11, f2 = sum(o11), n = NULL, fun = "ll") {
+  min_n <- sum(f1 + f2)
+  if (is.null(n)) n <- min_n
+  if (n < min_n) stop("`n` cannot be less than the sum of f1 and f2")
+
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
   stopifnot(identical(length(f1), length(o11)))
 
