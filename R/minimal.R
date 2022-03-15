@@ -39,7 +39,7 @@ ll <- function(f1, o11, n = sum(f1 + f2), f2 = sum(o11), one_sided = TRUE) {
 #' Details
 #'
 #' @return numeric
-#' @details TODO
+#' @details TODO:
 #' @examples
 #' dwg(c(41, 32, 41, 12), f = 4, size = 100)
 #'
@@ -55,4 +55,32 @@ dwg <- function(cpos, f, size, corr = TRUE) { # word growth dispersion
   ans
 }
 
+#' Deviation of proportions
+#'
+#' TODO:
+#'
+#' @param v integer vector with per document frequencies
+#' @param tokens character or factor
+#' @param parts character or factor
+#' @param norm logical whether or not to normalize, see Details
+#'
+#' @return numeric
+#' @details TODO:
+#' @examples
+#' n <- 50
+#' v <- sample(1:100, n, replace = TRUE)
+#' tokens <- sample(letters, n, replace = TRUE)
+#' parts <- sample(LETTERS[1:3], n, replace = TRUE)
+#' dp(v, tokens, parts)
+#'
+#' @export
+dp <- function(v, tokens, parts, norm = TRUE) {
+  tokens <- as.factor(tokens)
+  parts <- as.factor(parts)
+  f <- rowsum(v, tokens)[tokens, ]
+  s <- proportions(rowsum(v, parts))[parts, ]
+  m <- rowsum(cbind(s, abs(v / f - s)), tokens, reorder = FALSE)
+  ans <- (1 - m[, 1L] + m[, 2L]) / 2
+  if (isTRUE(norm)) ans <- ans / (1 - min(s))
+  ans
 }
