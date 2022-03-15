@@ -61,9 +61,35 @@ test_that("doesn't allow corpus size `n` to be too small", {
   expect_error(coll(2, 2, 2, 3, builtin_assoc()))
 })
 
-test_that("treat impossible input values", {
-  # different lengths
+test_that("lengths", {
   expect_error(coll(c(12, 13), 0, 12, 12, builtin_assoc()))
+  expect_error(coll(1:4, 1:4, 20, numeric(0), builtin_assoc()))
+  expect_error(coll(1:4, 1:4, numeric(0), 20, builtin_assoc()))
+  expect_error(coll(1:4, numeric(0), 20, 20, builtin_assoc()))
+  expect_error(coll(numeric(0), 1:4, 20, 20, builtin_assoc()))
+  expect_length(coll(c(0:3), c(0:3)), 4)
 })
 
-# TODO:test colnames
+test_that("custom functions", {
+  expect_equal(2, coll(2, 1, 3, 10, expression(f1)))
+  expect_equal(1, coll(2, 1, 3, 10, expression(o11)))
+  expect_equal(3, coll(2, 1, 3, 10, expression(f2)))
+  expect_equal(5, coll(2, 1, 3, fun = expression(n)))
+  expect_equal(
+    coll(2, 1, 3, 10),
+    coll(2, 1, 3, 10,
+         expression(2 * rowSums(o * log(o / e), na.rm = TRUE))),
+    ignore_attr = TRUE
+  )
+})
+
+test_that("colnames", {
+  expect_equal(
+    c("ll", "mi"),
+    colnames(coll(1:2, 0:1, 3, 10, c("ll", "mi")))
+  )
+  expect_equal(
+    "custom",
+    colnames(coll(1:2, 0:1, 3, 10, expression(custom = log(o11 / o22))))
+  )
+})
