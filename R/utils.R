@@ -27,18 +27,11 @@ check_funs <- function(fun, exprs) {
   }
 }
 
-count <- function(x) {
-  if (is.factor(x)) {
-    return(nlevels(x))
-  }
-  collapse::fndistinct.default(x, na.rm = FALSE)
-}
-
 as_factor <- function(x, lex = NULL) {
   if (is.factor(x)) {
     return(x)
   }
-  if (is.null(lex)) lex <- collapse::funique(x)
+  if (is.null(lex)) lex <- kit::funique(x)
   factorcpp(x, lex)
 }
 

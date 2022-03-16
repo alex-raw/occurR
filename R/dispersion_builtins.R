@@ -3,7 +3,7 @@ builtin_disp <- function() {
     # i = token index
     N        = nlevels(i),              # number of unique types
     ids      = as_factor(parts),        # part index
-    n        = count(ids),
+    n        = nlevels(ids),
     sizes    = sum_by(ids, n, v),
 
     # vectorized values                 # v = count word in part
@@ -54,8 +54,13 @@ sum_by <- function(f, n, g) {
 }
 
 max_min0 <- function(x, group, n, range) {
-  maxs <- collapse::fmax.default(x, group, use.g.names = FALSE, na.rm = FALSE)
-  mins <- collapse::fmin.default(x, group, use.g.names = FALSE, na.rm = FALSE)
+  if (requireNamespace("collapse")) {
+    maxs <- collapse::fmax.default(x, group, use.g.names = FALSE, na.rm = FALSE)
+    mins <- collapse::fmin.default(x, group, use.g.names = FALSE, na.rm = FALSE)
+  } else {
+    maxs <- tapply(x, group, max, na.rm = TRUE)
+    mins <- tapply(x, group, max, na.rm = TRUE)
+  }
   non_zero <- range >= n
   maxs[non_zero] <- maxs[non_zero] - mins[non_zero]
   maxs
