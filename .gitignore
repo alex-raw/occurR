@@ -11,3 +11,4 @@ archive*
 *.dll
 *.html
 Session.vim
+docs

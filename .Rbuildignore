@@ -6,3 +6,6 @@ archive/
 ^\.github$
 ^codecov\.yml$
 Session.vim
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

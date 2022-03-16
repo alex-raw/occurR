@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "alexraw@mailbox.com"
            )
-URL: www.alexraw.xyz
+URL: https://alex-raw.github.io/occurR/
 Description: Tools to calculate association and dispersion measures from various types of word frequency data.
 License: GPL (>= 3)
 Encoding: UTF-8
