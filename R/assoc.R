@@ -10,13 +10,15 @@
 #' @param fun character vector for built-in measures (see Details).
 #' alternatively a custom function, expression, or call. if names are supplied,
 #' they are used in the output
+#' @param flip character names of measures for which to flip the sign, inteded
+#' to signify negative association with two-sided measures
 #'
 #' @return matrix
 #' @details TODO:
 #'
 #' @export
 coll <- function(o11, f1, f2 = sum(o11), n = NULL,
-                 fun = "ll", neg_repulsed = FALSE) {
+                 fun = "ll", flip = NULL) {
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
 
@@ -35,10 +37,12 @@ coll <- function(o11, f1, f2 = sum(o11), n = NULL,
     run_coll_funs(input, fun),
     warning = function(w) {
       run_coll_funs(lapply(input, as.numeric), fun)
-    }
-  )
+    })
 
-  # TODO: sign swap if one-sided
+  # for consistency if input lengths are == 1
+  if (!is.matrix(ans)) ans <- t(as.matrix(ans))
+  if (is.character(flip))
+    return(flip_negative_assoc(ans, o11, e11 = (f1 * f2) / n, flip = flip))
 
   ans
 }

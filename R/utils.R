@@ -35,10 +35,11 @@ as_factor <- function(x, lex = NULL) {
   factorcpp(x, lex)
 }
 
-make_one_sided <- function(assoc, o11, e11) {
+flip_negative_assoc <- function(x, o11, e11, funs, flip) {
+  two_sided <- colnames(x) %in% flip
   repulsed <- o11 < e11
-  assoc[repulsed] <- -assoc[repulsed]
-  assoc
+  x[repulsed, two_sided] <- -x[repulsed, two_sided]
+  x
 }
 
 # maths helper functions, cf. UCS/R

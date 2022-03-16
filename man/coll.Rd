@@ -4,12 +4,12 @@
 \alias{coll}
 \title{Association measures for collocation and collostruction}
 \usage{
-coll(f1, o11, f2 = sum(o11), n = NULL, fun = "ll")
+coll(o11, f1, f2 = sum(o11), n = NULL, fun = "ll", flip = NULL)
 }
 \arguments{
-\item{f1}{numeric vector}
-
 \item{o11}{numeric vector with joint frequencies}
+
+\item{f1}{numeric vector}
 
 \item{f2}{numeric, if not provided, sum of o11 is used}
 
@@ -18,6 +18,9 @@ coll(f1, o11, f2 = sum(o11), n = NULL, fun = "ll")
 \item{fun}{character vector for built-in measures (see Details).
 alternatively a custom function, expression, or call. if names are supplied,
 they are used in the output}
+
+\item{flip}{character names of measures for which to flip the sign, inteded
+to signify negative association with two-sided measures}
 }
 \value{
 matrix

@@ -71,10 +71,10 @@ test_that("lengths", {
 })
 
 test_that("custom functions", {
-  expect_equal(2, coll(1, 2, 3, 10, expression(f1)))
-  expect_equal(1, coll(1, 2, 3, 10, expression(o11)))
-  expect_equal(3, coll(1, 2, 3, 10, expression(f2)))
-  expect_equal(5, coll(1, 2, 3, fun = expression(n)))
+  expect_equal(matrix(2), coll(1, 2, 3, 10, expression(f1)))
+  expect_equal(matrix(1), coll(1, 2, 3, 10, expression(o11)))
+  expect_equal(matrix(3), coll(1, 2, 3, 10, expression(f2)))
+  expect_equal(matrix(5), coll(1, 2, 3, fun = expression(n)))
   expect_equal(
     coll(1, 2, 3, 10),
     coll(1, 2, 3, 10,
@@ -92,4 +92,22 @@ test_that("colnames", {
     "custom",
     colnames(coll(0:1, 1:2, 3, 10, expression(custom = log(o11 / o22))))
   )
+})
+
+test_that("flip", {
+  x <- coll(1, 100, 1000, fun = builtin_assoc())
+  y <- coll(1, 100, 1000, fun = builtin_assoc(), flip = "ll")
+  y[, "ll"] <- -y[, "ll"]
+  z <- coll(1, 100, 1000, fun = builtin_assoc(), flip = "")
+  w <- coll(1, 100, 1000, fun = builtin_assoc(), flip = c("ll", "jaccard"))
+  w[, "ll"] <- -w[, "ll"]
+  w[, "jaccard"] <- -w[, "jaccard"]
+  expect_identical(x, z)
+  expect_identical(x, y)
+  expect_identical(x, y)
+
+  custom_noflip <- coll(1, 1000, 1000, fun = expression(test = e12))
+  custom_flip <- coll(1, 1000, 1000, fun = expression(test = e12), flip = "test")
+  custom_flip[, "test"] <- -custom_flip[, "test"]
+  expect_identical(custom_flip, custom_noflip)
 })
