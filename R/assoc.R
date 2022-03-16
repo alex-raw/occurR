@@ -3,8 +3,8 @@
 #' Calculates association measures from vectors of frequencies and
 #' joint frequencies.
 #'
-#' @param f1 numeric vector
 #' @param o11 numeric vector with joint frequencies
+#' @param f1 numeric vector
 #' @param f2 numeric, if not provided, sum of o11 is used
 #' @param n numeric, if not provided, sum of f1 is used
 #' @param fun character vector for built-in measures (see Details).
@@ -15,9 +15,12 @@
 #' @details TODO:
 #'
 #' @export
-coll <- function(f1, o11, f2 = sum(o11), n = NULL, fun = "ll") {
+coll <- function(o11, f1, f2 = sum(o11), n = NULL,
+                 fun = "ll", neg_repulsed = FALSE) {
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
+
+  # FIXME: decide how to handle NAs; currently throws error in this `if`
   if (n < min_n) stop("`n` cannot be less than the sum of f1 and f2")
 
   stopifnot(is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2))
@@ -27,10 +30,8 @@ coll <- function(f1, o11, f2 = sum(o11), n = NULL, fun = "ll") {
     stop("Joint frequencies cannot be larger than individual counts")
   }
 
-  # TODO: na.rm
-
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
-  out <- tryCatch(
+  ans <- tryCatch(
     run_coll_funs(input, fun),
     warning = function(w) {
       run_coll_funs(lapply(input, as.numeric), fun)
@@ -39,7 +40,7 @@ coll <- function(f1, o11, f2 = sum(o11), n = NULL, fun = "ll") {
 
   # TODO: sign swap if one-sided
 
-  out
+  ans
 }
 
 run_coll_funs <- function(input, fun) {
