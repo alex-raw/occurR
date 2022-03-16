@@ -1,6 +1,10 @@
+assocs <- builtin_assoc()
+to_remove <- c("zscore", "zscore_cor", "mi_conf", "poisson_pv")
+assocs <- assocs[!names(assocs) %in% to_remove]
+
 test_that("assoc builtins", {
-  expect_type(builtin_assoc(), "expression")
-  result <- eval(builtin_assoc()["ll"], list(
+  expect_type(assocs, "expression")
+  result <- eval(assocs["ll"], list(
     o = matrix(11:20, 2),
     e = matrix(1:10, 2)
   ))
@@ -50,23 +54,23 @@ test_that("bare-bones functions return same as main functions", {
 })
 
 test_that("doesn't allow o11 > f1/f2", {
-  expect_error(coll(2, 1, 1, builtin_assoc()))
-  expect_error(coll(2, 1, 2, builtin_assoc()))
-  expect_error(coll(2, 2, 2, builtin_assoc()))
+  expect_error(coll(2, 1, 1, assocs))
+  expect_error(coll(2, 1, 2, assocs))
+  expect_error(coll(2, 2, 2, assocs))
 })
 
 test_that("doesn't allow corpus size `n` to be too small", {
-  expect_error(coll(0, 2, 1, 2, builtin_assoc()))
-  expect_error(coll(0, 1, 2, 2, builtin_assoc()))
-  expect_error(coll(2, 2, 2, 3, builtin_assoc()))
+  expect_error(coll(0, 2, 1, 2, assocs))
+  expect_error(coll(0, 1, 2, 2, assocs))
+  expect_error(coll(2, 2, 2, 3, assocs))
 })
 
 test_that("lengths", {
-  expect_error(coll(0, c(12, 13), 12, 12, builtin_assoc()))
-  expect_error(coll(1:4, 1:4, 20, numeric(0), builtin_assoc()))
-  expect_error(coll(1:4, 1:4, numeric(0), 20, builtin_assoc()))
-  expect_error(coll(1:4, numeric(0), 20, 20, builtin_assoc()))
-  expect_error(coll(numeric(0), 1:4, 20, 20, builtin_assoc()))
+  expect_error(coll(0, c(12, 13), 12, 12, assocs))
+  expect_error(coll(1:4, 1:4, 20, numeric(0), assocs))
+  expect_error(coll(1:4, 1:4, numeric(0), 20, assocs))
+  expect_error(coll(1:4, numeric(0), 20, 20, assocs))
+  expect_error(coll(numeric(0), 1:4, 20, 20, assocs))
   expect_length(coll(c(0:3), c(0:3)), 4)
 })
 
@@ -95,11 +99,11 @@ test_that("colnames", {
 })
 
 test_that("flip", {
-  x <- coll(1, 100, 1000, fun = builtin_assoc())
-  y <- coll(1, 100, 1000, fun = builtin_assoc(), flip = "ll")
+  x <- coll(1, 100, 1000, fun = assocs)
+  y <- coll(1, 100, 1000, fun = assocs, flip = "ll")
   y[, "ll"] <- -y[, "ll"]
-  z <- coll(1, 100, 1000, fun = builtin_assoc(), flip = "")
-  w <- coll(1, 100, 1000, fun = builtin_assoc(), flip = c("ll", "jaccard"))
+  z <- coll(1, 100, 1000, fun = assocs, flip = "")
+  w <- coll(1, 100, 1000, fun = assocs, flip = c("ll", "jaccard"))
   w[, "ll"] <- -w[, "ll"]
   w[, "jaccard"] <- -w[, "jaccard"]
   expect_identical(x, z)
