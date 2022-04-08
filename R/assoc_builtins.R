@@ -44,6 +44,8 @@ builtin_assoc <- function() {
   )
 }
 
+zscore <- \(o11, e11) (o11 - e11) / sqrt(e11)
+
 # maths helper functions, cf. UCS/R
 reg_gamma_inv <- function(a, y, lower = TRUE, log = FALSE) {
   if (log == TRUE) y <- y * log(10)
