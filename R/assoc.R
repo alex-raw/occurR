@@ -17,7 +17,8 @@
 #' @details TODO:
 #'
 #' @export
-coll <- function(o11, f1, f2 = sum(o11), n = NULL, fun = "ll", flip = NULL) {
+collexemes <- function(o11, f1, f2 = sum(o11), n = NULL,
+                       fun = "ll", flip = NULL) {
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
 
@@ -34,21 +35,25 @@ coll <- function(o11, f1, f2 = sum(o11), n = NULL, fun = "ll", flip = NULL) {
     stop("Joint frequencies cannot be larger than individual counts")
   }
 
-  input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
+  coll(list(f1 = f1, o11 = o11, f2 = f2, n = n), fun, flip)
+}
+
+coll <- function(input, fun, flip) {
   exprs <- c(builtin_assoc(), if (is.expression(fun)) fun)
   ans <- tryCatch(
     eval_exprs(input, fun, exprs),
     warning = function(w) {
-      message("Note: values coerced to numeric to prevent integer overflow")
       eval_exprs(lapply(input, as.numeric), fun, exprs)
+      message("Note: values coerced to numeric to prevent integer overflow")
     })
 
   names <- if (is.character(fun)) fun else names(fun)
   ans <- do.call(cbind, ans[names])
 
-  if (is.character(flip))
-    ans <- flip_negative_assoc(ans, o11, e11 = (f1 * f2) / n, flip = flip)
-    # TODO: e11 can be retrieved from above?
+  if (is.character(flip)) {
+    e11 <- (input$f1 * input$f2) / input$n
+    ans <- flip_negative_assoc(ans, input$o11, e11, flip)
+  }
 
   ans
 }
