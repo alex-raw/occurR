@@ -20,7 +20,7 @@ dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
 
   # TODO: implement expression or function input like in assoc.R
 
-  # TODO: check what happens if v = 0. might get non-sensical results
+  # TODO: check what happens if v = 0. might get nonsensical results
 
   v <- stats::na.fail(as.numeric(v))
   tokens <- as_factor(tokens, lexicon)
@@ -43,7 +43,6 @@ gather_vars <- function(fun, exprs) {
 calculate_disp <- function(x, fun, exprs = builtin_disp()) {
   fun <- intersect(gather_vars(fun, exprs), names(exprs))
   exprs <- exprs[fun]
-  x[fun] <- 0L
   for (i in names(exprs)) x[[i]] <- eval(exprs[[i]], x)
   x
 }

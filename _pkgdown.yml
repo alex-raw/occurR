@@ -1,5 +1,4 @@
 url: https://alex-raw.github.io/occurR/
 template:
   bootstrap: 5
-  bootswatch: lux
-
+  bootswatch: sandstone
