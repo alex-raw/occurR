@@ -39,6 +39,7 @@ coll <- function(o11, f1, f2 = sum(o11), n = NULL, fun = "ll", flip = NULL) {
   ans <- tryCatch(
     eval_exprs(input, fun, exprs),
     warning = function(w) {
+      message("Note: values coerced to numeric to prevent integer overflow")
       eval_exprs(lapply(input, as.numeric), fun, exprs)
     })
 

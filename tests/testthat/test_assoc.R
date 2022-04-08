@@ -83,3 +83,7 @@ test_that("flip", {
   custom_flip[, "test"] <- -custom_flip[, "test"]
   expect_identical(custom_flip, custom_noflip)
 })
+
+test_that("no integer overflow", {
+  expect_message(collexemes(1e8L, 1e9L))
+})
