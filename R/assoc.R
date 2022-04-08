@@ -35,27 +35,21 @@ coll <- function(o11, f1, f2 = sum(o11), n = NULL, fun = "ll", flip = NULL) {
   }
 
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
+  exprs <- c(builtin_assoc(), if (is.expression(fun)) fun)
   ans <- tryCatch(
-    run_coll_funs(input, fun),
+    eval_exprs(input, fun, exprs),
     warning = function(w) {
-      run_coll_funs(lapply(input, as.numeric), fun)
+      eval_exprs(lapply(input, as.numeric), fun, exprs)
     })
 
-  # for consistency if input lengths are == 1
-  if (!is.matrix(ans)) ans <- t(as.matrix(ans))
+  names <- if (is.character(fun)) fun else names(fun)
+  ans <- do.call(cbind, ans[names])
+
   if (is.character(flip))
-    return(flip_negative_assoc(ans, o11, e11 = (f1 * f2) / n, flip = flip))
+    ans <- flip_negative_assoc(ans, o11, e11 = (f1 * f2) / n, flip = flip)
+    # TODO: e11 can be retrieved from above?
 
   ans
-}
-
-run_coll_funs <- function(input, fun) {
-  if (is.character(fun)) {
-    check_funs(fun, builtin_assoc())
-    fun <- builtin_assoc()[fun]
-  }
-  vars <- sapply(all.vars(fun), get_assoc_vars, input, simplify = FALSE)
-  vapply(fun, eval, numeric(length(input$f1)), vars)
 }
 
 coll.default <- function() { # nolint

@@ -1,6 +1,21 @@
 # cf. Evert (2004) & http://www.collocations.de
 builtin_assoc <- function() {
   expression(
+    r1    = f1,
+    c1    = f2,
+    r2    = n - f1,
+    c2    = n - f2,
+    o12   = f2 - o11,
+    o21   = f1 - o11,
+    o22   = n - f1 - f2 + o11,
+    e11   = f1 * f2 / n,
+    e12   = (n - f1) * f2 / n,
+    e21   = (n - f2) * f1 / n,
+    e22   = (n - f1) * (n - f2) / n,
+    o     = cbind(o11, o12, o21, o22),
+    e     = cbind(e11, e12, e21, e22),
+    alpha = 2,
+
     ll = 2 * rowSums(o * log(o / e), na.rm = TRUE),
     mi = log10(o11 / e11),
     mi_squared = log10(o11^2 / e11),
@@ -28,51 +43,6 @@ builtin_assoc <- function() {
     }
   )
 }
-
-# get vectors of values in a contingency table,
-get_assoc_vars <- function(x, input) {
-  with(input, switch(x,
-    n     = n,
-    f1    = f1,
-    f2    = f2,
-    o11   = o11,
-    r1    = f1,
-    c1    = f2,
-    r2    = n - f1,
-    c2    = n - f2,
-    o12   = f2 - o11,
-    o21   = f1 - o11,
-    o22   = n - f1 - f2 + o11,
-    e11   = f1 * f2 / n,
-    e12   = (n - f1) * f2 / n,
-    e21   = (n - f2) * f1 / n,
-    e22   = (n - f1) * (n - f2) / n,
-    o     = get_obs(f1, f2, o11, n),
-    e     = get_exp(f1, f2, n),
-    alpha = 2,
-    stop(sprintf("No built-in way to calculate `%s`.", x))
-  ))
-}
-
-get_obs <- function(f1, f2, o11, n) {
-  cbind(
-    o11 = o11,
-    o12 = f2 - o11,
-    o21 = f1 - o11,
-    o22 = n - f1 - f2 + o11
-  )
-}
-
-get_exp <- function(f1, f2, n) {
-  cbind(
-    e11 = f1 * f2,
-    e12 = (n - f1) * f2,
-    e21 = (n - f2) * f1,
-    e22 = (n - f1) * (n - f2)
-  ) / n
-}
-
-zscore <- \(o11, e11) (o11 - e11) / sqrt(e11)
 
 # maths helper functions, cf. UCS/R
 reg_gamma_inv <- function(a, y, lower = TRUE, log = FALSE) {

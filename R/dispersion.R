@@ -25,7 +25,7 @@ dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
   v <- stats::na.fail(as.numeric(v))
   tokens <- as_factor(tokens, lexicon)
   x <- list(parts = parts, i = tokens, v = v)
-  ans <- calculate_disp(x, fun = fun)[c("f", fun)]
+  ans <- calculate_disp(x, fun = fun, builtin_disp())[c("f", fun)]
 
   if (!is.null(names(fun))) names(ans) <- names(fun)
   data.frame(types = levels(tokens), ans)
@@ -40,7 +40,8 @@ gather_vars <- function(fun, exprs) {
   }
 }
 
-calculate_disp <- function(x, fun, exprs = builtin_disp()) {
+calculate_disp <- function(x, fun, exprs) {
+  if (is.expression(fun)) fun <- names(fun)
   fun <- intersect(gather_vars(fun, exprs), names(exprs))
   exprs <- exprs[fun]
   for (i in names(exprs)) x[[i]] <- eval(exprs[[i]], x)
