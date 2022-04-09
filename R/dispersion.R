@@ -17,20 +17,15 @@ dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
     identical(length(v), length(tokens), length(parts))
   )
 
-  # TODO: check what happens if v = 0. might get nonsensical results
-
-  exprs <- builtin_disp()
-  if (is.character(fun)) check_funs(fun, exprs)
-  if (is.expression(fun)) {
-    exprs <- c(exprs, fun)
-    fun <- names(fun)
-  }
-
   if (anyNA(v)) stop("missing values in `v`")
 
+  # TODO: check what happens if v = 0. might get nonsensical results
+
+  vars <- extract_vars(fun, builtin_disp())
   tokens <- as_factor(tokens, lexicon)
-  x <- list(parts = parts, i = tokens, v = as.numeric(v))
-  ans <- eval_exprs(x, fun, exprs)[c("f", fun)]
+  ans <- list(parts = parts, i = tokens, v = as.numeric(v)) |>
+    eval_exprs(vars)
+  ans <- ans[c("f", fun)]
 
   if (!is.null(names(fun))) names(ans) <- names(fun)
   data.frame(types = levels(tokens), ans)

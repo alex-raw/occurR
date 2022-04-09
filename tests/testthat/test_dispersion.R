@@ -20,15 +20,17 @@ test_that("minimal dp == dispersion(..., fun = \"dp\")", {
   tokens <- sample(letters, n, replace = TRUE)
   parts <- sample(LETTERS[1:3], n, replace = TRUE)
 
-  expect_equal(
-    dp(v, tokens, parts),
-    dispersion(v, tokens, parts)$dp.norm,
-    ignore_attr = TRUE
-  )
+  big <- dispersion(v, tokens, parts, "dp")
+  big <- big[order(big$types), ]
+  big <- setNames(big$dp, big$types)
+  mini <- dp(v, tokens, parts, norm = FALSE)
+  mini <- mini[order(names(mini))]
+  expect_equal(mini, big)
 
-  expect_equal(
-    dp(v, tokens, parts, norm = FALSE),
-    dispersion(v, tokens, parts, "dp")$dp,
-    ignore_attr = TRUE
-  )
+  big <- dispersion(v, tokens, parts, "dp.norm")
+  big <- big[order(big$types), ]
+  big <- setNames(big$dp, big$types)
+  mini <- dp(v, tokens, parts, norm = TRUE)
+  mini <- mini[order(names(mini))]
+  expect_equal(mini, big)
 })

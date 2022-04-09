@@ -38,16 +38,27 @@ as_factor <- function(x, lex = NULL) {
 gather_vars <- function(labels, exprs) {
   out <- union(all.vars(exprs[labels]), labels)
   if (identical(labels, out)) {
-    return(out)
+    return(exprs[out])
   } else {
     gather_vars(out, exprs)
   }
 }
 
-eval_exprs <- function(x, labels, exprs) {
-  fun <- gather_vars(labels, exprs) |> intersect(names(exprs))
-  exprs <- exprs[fun]
-  for (i in names(exprs)) x[[i]] <- eval(exprs[[i]], x)
+extract_vars <- function(fun, exprs) {
+  if (is.character(fun)) check_funs(fun, exprs)
+  if (is.expression(fun)) {
+    exprs <- c(exprs, fun)
+    fun <- names(fun)
+  }
+  out <- gather_vars(fun, exprs)
+  attr(out, "labels") <- fun
+  out
+}
+
+eval_exprs <- function(x, exprs) {
+  for (i in names(exprs)) {
+    x[[i]] <- eval(exprs[[i]], x)
+  }
   x
 }
 

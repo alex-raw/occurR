@@ -35,25 +35,20 @@ collexemes <- function(o11, f1, f2 = sum(o11), n = NULL,
     stop("Joint frequencies cannot be larger than individual counts")
   }
 
-  exprs <- builtin_assoc()
-  if (is.expression(fun)) {
-    exprs <- c(exprs, fun)
-    fun <- names(fun)
-  }
-
   input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
-  coll(input, exprs, fun, flip)
-}
+  vars <- extract_vars(fun, builtin_assoc())
 
-coll <- function(input, exprs, labels, flip) {
-  ans <- tryCatch(
-    eval_exprs(input, labels, exprs),
-    warning = function(w) {
-      ans <- eval_exprs(lapply(input, as.numeric), labels, exprs)
+  coll(input, vars, flip) |>
+    tryCatch(warning = function(w) {
+      ans <- coll(lapply(input, as.numeric), vars, flip)
       message("Note: values coerced to numeric to prevent integer overflow")
       ans
     })
+}
 
+coll <- function(input, vars, flip) {
+  ans <- eval_exprs(input, vars)
+  labels <- attr(vars, "labels")
   ans <- do.call(cbind, ans[labels])
 
   if (is.character(flip)) {
