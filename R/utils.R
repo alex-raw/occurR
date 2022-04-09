@@ -30,8 +30,7 @@ check_funs <- function(fun, exprs) {
 
 as_factor <- function(x, lex = NULL) {
   if (is.factor(x)) return(x)
-  if (is.null(lex)) lex <- kit::funique(x)
-  factorcpp(x, lex)
+  kit::charToFact(x, nThread = parallel::detectCores())
 }
 
 # recursively get all variable names necessary to calculate intermediate and
