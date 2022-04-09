@@ -57,21 +57,3 @@ coll <- function(input, fun, flip) {
 
   ans
 }
-
-coll.default <- function() { # nolint
-}
-
-coll.data.frame <- function() { # nolint
-}
-
-coll.data.table <- function() { # nolint
-  if (!requireNamespace("data.table", quietly = TRUE)) {
-    stop("Package \"data.table\" needed for this function to work.
-         Please install it.", call. = FALSE
-    )
-  }
-  datatable.aware <- TRUE # nolint
-}
-
-# due to NSE notes in R CMD check
-o11 <- f1 <- assoc <- e11 <- NULL

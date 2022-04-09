@@ -35,19 +35,18 @@ as_factor <- function(x, lex = NULL) {
 }
 
 # recursively get all variable names necessary to calculate intermediate and
-# final values from list of expressions
-gather_vars <- function(fun, exprs) {
-  out <- union(all.vars(exprs[fun]), fun)
-  if (identical(fun, out)) {
+# final values from list of expressions; essentially traverse the AST
+gather_vars <- function(labels, exprs) {
+  out <- union(all.vars(exprs[labels]), labels)
+  if (identical(labels, out)) {
     return(out)
   } else {
     gather_vars(out, exprs)
   }
 }
 
-eval_exprs <- function(x, fun, exprs) {
-  if (is.expression(fun)) fun <- names(fun)
-  fun <- intersect(gather_vars(fun, exprs), names(exprs))
+eval_exprs <- function(x, labels, exprs) {
+  fun <- gather_vars(labels, exprs) |> intersect(names(exprs))
   exprs <- exprs[fun]
   for (i in names(exprs)) x[[i]] <- eval(exprs[[i]], x)
   x
