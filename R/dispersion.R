@@ -10,7 +10,6 @@
 #'
 #' @export
 dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
-  check_funs(fun, builtin_disp())
   stopifnot(
     is.numeric(v),
     is.character(tokens) || is.factor(tokens) || is.numeric(tokens),
@@ -18,14 +17,20 @@ dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
     identical(length(v), length(tokens), length(parts))
   )
 
-  # TODO: implement expression or function input like in assoc.R
-
   # TODO: check what happens if v = 0. might get nonsensical results
 
-  v <- stats::na.fail(as.numeric(v))
+  exprs <- builtin_disp()
+  if (is.character(fun)) check_funs(fun, exprs)
+  if (is.expression(fun)) {
+    exprs <- c(exprs, fun)
+    fun <- names(fun)
+  }
+
+  if (anyNA(v)) stop("missing values in `v`")
+
   tokens <- as_factor(tokens, lexicon)
-  x <- list(parts = parts, i = tokens, v = v)
-  ans <- eval_exprs(x, fun = fun, builtin_disp())[c("f", fun)]
+  x <- list(parts = parts, i = tokens, v = as.numeric(v))
+  ans <- eval_exprs(x, fun, exprs)[c("f", fun)]
 
   if (!is.null(names(fun))) names(ans) <- names(fun)
   data.frame(types = levels(tokens), ans)
