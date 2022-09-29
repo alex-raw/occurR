@@ -9,7 +9,6 @@ test_that("available_measures returns correctly", {
 })
 
 test_that("sum_by handles missing values", {
-  # x <- as_factor(c("a", NA, "a", NA, "b")) # BUG: broken in `kit::charToFact`
   x <- as_factor(c("a", "s", NA, "s", "c"))
   n <- c(1, 2, 3, 4, 5)
   u <- length(unique(x))

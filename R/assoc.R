@@ -27,7 +27,6 @@ collexemes <- function(o11, f1, f2 = sum(o11), n = NULL,
 
   stopifnot(
     is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2),
-    is.null(flip) || is.character(flip),
     identical(length(f1), length(o11))
   )
 
