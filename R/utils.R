@@ -71,11 +71,3 @@ eval_exprs <- function(x, exprs) {
 
   x
 }
-
-flip_negative_assoc <- function(x, o11, e11, flip) {
-  stopifnot(is.character(flip))
-  two_sided <- colnames(x) %in% flip
-  repulsed <- o11 < e11
-  x[repulsed, two_sided] <- -x[repulsed, two_sided]
-  x
-}

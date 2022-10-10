@@ -53,5 +53,10 @@ coll <- function(input, vars, flip = NULL) {
 
   ans <- do.call(cbind, ans[attr(vars, "labels")])
 
+  if (is.null(flip)) return(ans)
+
+  repulsed <- with(input, o11 < f1 * f2 / n)
+  two_sided <- colnames(ans) %in% flip
+  ans[repulsed, two_sided] <- -ans[repulsed, two_sided]
   ans
 }
