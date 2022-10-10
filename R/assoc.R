@@ -22,38 +22,36 @@ collexemes <- function(o11, f1, f2 = sum(o11), n = NULL,
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
 
-  # FIXME: decide how to handle NAs; currently throws error in this `if`
-  if (n < min_n) stop("`n` cannot be less than the sum of f1 and f2")
-
-  stopifnot(
-    is.numeric(f1), is.numeric(o11), is.numeric(n), is.numeric(f2),
-    identical(length(f1), length(o11))
-  )
-
-  if (any(o11 > f1) || any(o11 > f2) || any(o11 > n)) {
-    stop("Joint frequencies cannot be larger than individual counts")
-  }
-
-  input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
   vars <- extract_vars(fun, builtin_assoc())
 
-  coll(input, vars, flip) |>
-    tryCatch(warning = function(w) {
-      ans <- coll(lapply(input, as.numeric), vars, flip)
-      message("Note: values coerced to numeric to prevent integer overflow")
-      ans
-    })
+  stopifnot(
+    is.character(flip) || is.null(flip),
+    "`n` cannot be less than the sum of f1 and f2" = n >= min_n,
+    is.numeric(o11),
+    is.numeric(f1),
+    is.numeric(f2),
+    is.numeric(n),
+    length(n) == 1 || identical(length(f1), length(n)),
+    identical(length(f1), length(o11)),
+    all(o11 <= f1),
+    all(o11 <= f2),
+    all(o11 <= n)
+  )
+
+  list(f1 = f1, o11 = o11, f2 = f2, n = n) |>
+    coll(vars, flip)
 }
 
-coll <- function(input, vars, flip) {
-  ans <- eval_exprs(input, vars)
-  labels <- attr(vars, "labels")
-  ans <- do.call(cbind, ans[labels])
+coll <- function(input, vars, flip = NULL) {
+  ans <- eval_exprs(input, vars) |>
+    withCallingHandlers(warning = \(w) w <<- w$message)
 
-  if (is.character(flip)) {
-    e11 <- (input$f1 * input$f2) / input$n
-    ans <- flip_negative_assoc(ans, input$o11, e11, flip)
+  if (w == "NAs produced by integer overflow") {
+    warning("Coercing values to numeric due to integer overflow")
+    ans <- eval_exprs(lapply(input, as.numeric), vars)
   }
+
+  ans <- do.call(cbind, ans[attr(vars, "labels")])
 
   ans
 }

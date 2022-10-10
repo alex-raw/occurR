@@ -47,9 +47,7 @@ builtin_disp <- function() {
 }
 
 sum_by <- function(f, n, g) {
-  if (any(sapply(as.list(environment()), is.null))) {
-    stop("Arguments cannot be NULL")
-  }
+  stopifnot(length(f), length(n), length(g))
   groupsum(g, n, f)
 }
 
@@ -78,12 +76,8 @@ carroll_d2 <- function(p, p_sum, group, n, N) { # nolint
 }
 
 kromer <- function(x, group, N) { # nolint
-  digamma_ <- if (requireNamespace("Rfast", quietly = TRUE)) {
-    Rfast::Digamma
-  } else {
-    digamma
-  }
-  sum_by(group, N, digamma_(x + 1) - digamma_(1))
+  if (requireNamespace("Rfast", quietly = TRUE)) digamma <- Rfast::Digamma
+  sum_by(group, N, digamma(x + 1) - digamma(1))
 }
 
 sd_pop <- function(v, n, range, mean, group, N) { # nolint

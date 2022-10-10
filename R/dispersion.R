@@ -12,12 +12,11 @@
 dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
   stopifnot(
     is.numeric(v),
-    is.character(tokens) || is.factor(tokens) || is.numeric(tokens),
-    is.character(parts) || is.factor(parts) || is.numeric(parts),
-    identical(length(v), length(tokens), length(parts))
+    class(tokens) %in% c("character", "factor", "numeric"),
+    class(parts) %in% c("character", "factor", "numeric"),
+    identical(length(v), length(tokens), length(parts)),
+    "missing values in `v`" = !anyNA(v)
   )
-
-  if (anyNA(v)) stop("missing values in `v`")
 
   # TODO: check what happens if v = 0. might get nonsensical results
 
