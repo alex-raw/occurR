@@ -54,13 +54,14 @@ sum_by <- function(f, n, g) {
 }
 
 max_min0 <- function(x, group, n, range) {
-  if (requireNamespace("collapse")) {
+  if (requireNamespace("collapse", quietly = TRUE)) {
     maxs <- collapse::fmax.default(x, group, use.g.names = FALSE, na.rm = FALSE)
     mins <- collapse::fmin.default(x, group, use.g.names = FALSE, na.rm = FALSE)
   } else {
-    maxs <- tapply(x, group, max, na.rm = TRUE)
-    mins <- tapply(x, group, max, na.rm = TRUE)
+    maxs <- tapply(x, group, max, na.rm = FALSE)
+    mins <- tapply(x, group, min, na.rm = FALSE)
   }
+
   non_zero <- range >= n
   maxs[non_zero] <- maxs[non_zero] - mins[non_zero]
   maxs

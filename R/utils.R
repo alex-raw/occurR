@@ -14,7 +14,7 @@ available_measures <- function(stat = "") {
   i_disp <- seq(which(disp == "range"), length(disp))
 
   switch(stat,
-    assoc = assoc,
+    assoc = assoc[i_assoc],
     disp = disp[i_disp],
     list(assoc = assoc[i_assoc], disp = disp[i_disp])
   )
