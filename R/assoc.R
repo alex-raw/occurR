@@ -31,7 +31,8 @@ collexemes <- function(o11, f1, f2 = sum(o11), n = NULL,
     is.numeric(f1),
     is.numeric(f2),
     is.numeric(n),
-    length(n) == 1 || identical(length(f1), length(n)),
+    length(n)  == 1 || identical(length(f1), length(n)),
+    length(f2) == 1 || identical(length(f1), length(f2)),
     identical(length(f1), length(o11)),
     all(o11 <= f1),
     all(o11 <= f2),
@@ -42,21 +43,26 @@ collexemes <- function(o11, f1, f2 = sum(o11), n = NULL,
     coll(vars, flip)
 }
 
-coll <- function(input, vars, flip = NULL) {
-  ans <- eval_exprs(input, vars) |>
-    withCallingHandlers(warning = \(w) w <<- w$message)
+coll <- function(.x, vars, flip = NULL) {
+  if (any(lengths(.x) == 0)) return(numeric(0))
+
+  w <- ""
+  ans <- eval_exprs(.x, vars) |>
+    withCallingHandlers(warning = \(w) w <<- w$message) |>
+    suppressWarnings()
 
   if (w == "NAs produced by integer overflow") {
     warning("Coercing values to numeric due to integer overflow")
-    ans <- eval_exprs(lapply(input, as.numeric), vars)
+    ans <- eval_exprs(lapply(.x, as.numeric), vars)
   }
 
   ans <- do.call(cbind, ans[attr(vars, "labels")])
 
   if (is.null(flip)) return(ans)
 
-  repulsed <- with(input, o11 < f1 * f2 / n)
+  repulsed <- .x$o11 < .x$f1 * .x$f2 / .x$n
   two_sided <- colnames(ans) %in% flip
   ans[repulsed, two_sided] <- -ans[repulsed, two_sided]
   ans
 }
+

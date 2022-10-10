@@ -18,7 +18,7 @@ test_that("sum_by handles missing values", {
   lapply(nas,     \(y) expect_error(sum_by(x, y, n)))
   lapply(nas[-1], \(y) expect_error(sum_by(x, u, y)))
 
-  expect_identical(sum_by(x, u, numeric(0)), numeric(0))
+  expect_error(sum_by(x, u, numeric(0)))
   expect_identical(sum_by(x, u, n), as.vector(rowsum(n, x)))
 
   x <- as_factor(c("a", "c", "a", "c", "b"))

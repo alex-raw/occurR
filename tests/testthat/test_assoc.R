@@ -85,5 +85,5 @@ test_that("flip", {
 })
 
 test_that("no integer overflow", {
-  expect_message(collexemes(1e8L, 1e9L))
+  expect_warning(collexemes(1e8L, 1e9L))
 })

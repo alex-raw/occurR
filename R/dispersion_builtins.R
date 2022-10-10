@@ -47,7 +47,7 @@ builtin_disp <- function() {
 }
 
 sum_by <- function(f, n, g) {
-  stopifnot(length(f), length(n), length(g))
+  stopifnot(length(f) > 0, length(n) > 0, length(g) > 0)
   groupsum(g, n, f)
 }
 
