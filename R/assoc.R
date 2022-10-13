@@ -17,7 +17,26 @@
 #' @details TODO:
 #'
 #' @export
-collexemes <- function(o11, f1, f2 = sum(o11), n = NULL,
+collexemes <- \(.x, ...) UseMethod("collexemes")
+
+collexemes.data.frame <- function(.x, ...) {
+  # TODO:
+  collexemes.default(o11, f1, f2, n)
+}
+
+#' @export
+collexemes.data.table <- function(.x, ...) {
+  # TODO:
+  collexemes.default(o11, f1, f2, n)
+}
+
+#' @export
+collexemes.table <- function(.x, ...) {
+  # TODO:
+  collexemes.default(o11, f1, f2, n)
+}
+
+collexemes.default <- function(o11, f1, f2 = sum(o11), n = NULL,
                        fun = "ll", flip = NULL) {
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
