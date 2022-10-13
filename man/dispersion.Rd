@@ -4,7 +4,7 @@
 \alias{dispersion}
 \title{Calculate word dispersion measures}
 \usage{
-dispersion(v, tokens, parts, fun = "dp.norm", lexicon = NULL)
+dispersion(.x, ...)
 }
 \arguments{
 \item{v}{integer. counts}

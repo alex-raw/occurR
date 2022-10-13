@@ -4,7 +4,7 @@
 \alias{collexemes}
 \title{Association measures for collocation and collostruction}
 \usage{
-collexemes(o11, f1, f2 = sum(o11), n = NULL, fun = "ll", flip = NULL)
+collexemes(.x, ...)
 }
 \arguments{
 \item{o11}{numeric vector with joint frequencies}
