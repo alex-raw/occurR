@@ -1,6 +1,3 @@
-# data as linked on https://www.nltk.org/nltk_data/
-# also see http://korpus.uib.no/icame/brown/bcm.html
-
 # ------- Archive structure as of 2022-10-12:
 # ca01, ca02, ca03, ..., cats.txt, README, CONTENTS
 # brown/cats.txt contains ids equivalent to their file name next to their genre
@@ -37,7 +34,7 @@ parse_brown_file <- function(file, id, genre) {  # nolint
   .scan(as.character(file)) |>  # split on whitespace, get vector
     .gsub_last_slash() |>       # replace delimiter
     .read_txt(text = _) |>      # split again, get data.frame
-    cbind(id, genre)            # recycling here
+    cbind(id, genre, cols = _)  # recycling here
 }
 
 
@@ -60,20 +57,20 @@ get_brown <- function(url, archive_path) {
 main <- function() {
   temp_path <- tempdir()
   at_temp <- \(path) file.path(temp_path, path)
-  # on.exit(unlink(temp_path, recursive = TRUE))
 
+  # data as linked on https://www.nltk.org/nltk_data/
   url <- "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/brown.zip"  # nolint
   get_brown(url, archive_path = at_temp(basename(url)))
 
-  process_texts(
-    index_path = at_temp("cats.txt"),
-    .fun = parse_brown_file
-  ) |>
-    structure(
-      names = c("word", "pos", "ids", "genre"),
-      contents = .read_char(at_temp("CONTENTS")),
-      readme = .read_char(at_temp("README"))
-    )
+  structure(
+    process_texts(
+      index_path = at_temp("cats.txt"),
+      .fun = parse_brown_file
+    ),
+    names = c("id", "genre", "word", "pos"),
+    contents = .read_char(at_temp("CONTENTS")),
+    readme = .read_char(at_temp("README"))
+  )
 }
 
 brown <- main()
