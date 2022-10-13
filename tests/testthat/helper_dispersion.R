@@ -1,40 +1,52 @@
-every <- Filter(\(x) x != "kld.norm", available_measures("disp"))
-read_test_data <- function(path, ...)
+# currently no 3rd party data for kld.norm
+all_measures <- Filter(\(x) x != "kld.norm", available_measures("disp"))
+
+read_test_data <- function(path, ...) {
   utils::read.table(path, sep = "\t", na = "", quote = "", ...)
+}
 
-#---------------------------------------------------------- toy reference
-toy_reference <- read_test_data("toy_reference.tsv", header = TRUE)
-# toy calculation
-toy <- data.frame(table(
-  tokens = strsplit(c("bamnibeupbasatbewqnbcagabestabaghabeaatbahaabeaxat"), "")[[1]],
-  parts = rep(1:5, c(9, 10, 10, 10, 11))
-))
-toy <- toy[toy$Freq != 0, ]
+create_mock <- function() {
+  mock <- "bamnibeupbasatbewqnbcagabestabaghabeaatbahaabeaxat" |>
+    strsplit("") |> unlist() |>
+    table(tokens = _, parts = rep(1:5, c(9, 10, 10, 10, 11))) |>
+    as.data.frame(responseName = "v")
 
-v <- toy$Freq
-tokens <- toy$tokens
-parts <- toy$parts
-ans1 <- dispersion(v, tokens, parts, every)
-ans1_fact <- dispersion(v, as.factor(tokens), as.factor(parts), every)
-ans1 <- ans1[, colnames(toy_reference)]
-ans1_fact <- ans1_fact[, colnames(toy_reference)]
+  mock[mock$v != 0, ]
+}
 
-#---------------------------------------------------------- brown reference
-brown_reference <- read_test_data("brown_reference.tsv", header = TRUE)
-brown_reference <- brown_reference[order(brown_reference$types), ]
-rownames(brown_reference) <- NULL
+mock <- create_mock()
 
-# brown calculation
+ans1 <- dispersion(v, tokens, parts, all_measures) |>
+  with(mock, expr = _)
+
+ans1_fact <- dispersion(v, as.factor(tokens), as.factor(parts), all_measures) |>
+  with(mock, expr = _)
+
+mock_reference <- read_test_data("mock_reference.tsv", header = TRUE)
+ans1 <- ans1[, colnames(mock_reference)]
+ans1_fact <- ans1_fact[, colnames(mock_reference)]
+
+# existing brown values
 brown <- read_test_data("brown_word_id",
   colClasses = c("numeric", "character", "character"),
-  col.names  = c("Freq", "tokens", "parts")
+  col.names  = c("v", "tokens", "parts")
 )
-v2 <- brown$Freq
-tokens2 <- brown$tokens
-parts2 <- brown$parts
 
-ans2 <- dispersion(v2, tokens2, parts2, every)
+ans2 <- dispersion(v, tokens, parts, all_measures) |>
+  with(brown, expr = _)
+
+ans2_fact <- dispersion(v, as.factor(tokens), as.factor(parts), all_measures) |>
+  with(brown, expr = _)
+
 ans2 <- ans2[order(ans2$types), ]
-ans2_fact <- dispersion(v2, as.factor(tokens2), as.factor(parts2), every)
 ans2_fact <- ans2_fact[order(ans2_fact$types), ]
 rownames(ans2) <- NULL
+
+get_brown_reference <- function() {
+  res <- read_test_data("brown_reference.tsv", header = TRUE)
+  res <- res[order(res$types), ]
+  rownames(res) <- NULL
+  res
+}
+
+brown_reference <- get_brown_reference()
