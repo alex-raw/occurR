@@ -28,9 +28,6 @@ Suggests:
     covr,
     spelling
 Config/testthat/edition: 3
-<<<<<<< Updated upstream
-=======
-Depends: 
-    R (>= 2.10)
+Depends:
+    R (>= 4.1.0)
 Language: en-US
->>>>>>> Stashed changes
