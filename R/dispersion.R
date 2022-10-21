@@ -9,7 +9,7 @@
 #' for clean up and speed up
 #'
 #' @export
-dispersion <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
+dispersion <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL) {
   stopifnot(
     is.numeric(v),
     class(tokens) %in% c("character", "factor", "numeric"),

@@ -1,17 +1,28 @@
-test_that("dispersion returns expected columns", {
-  expect_s3_class(ans1, "data.frame")
-  expect_setequal(colnames(ans1), c("types", "f", every))
-  expect_true(nrow(ans1) == length(unique(tokens)))
+every <- Filter(\(x) x != "kld.norm", available_measures("disp"))
+.read_table <- function(path, ...)
+  utils::read.table(path, sep = "\t", na = "", quote = "", ..., header = TRUE)
+
+data(brown)
+x <- table(brown[, c("id", "word")]) |>
+  as.data.frame(responseName = "v") |>
+  with(dispersion(word, id, v, fun = every))
+
+ref <- .read_table(
+  "test_data_dispersion.tsv"
+)[, colnames(x)]
+
+x <- x[order(x$types), ][1:100, ]
+ref <- ref[order(ref$types), ][1:100, ]
+
+
+test_that("data sets are here", {
+  expect_s3_class(reference_disp, "data.frame")
+  expect_s3_class(brown, "data.frame")
+  expect_identical(colnames(x), c("types", "f", every))
 })
 
-test_that("dispersion produces expected values, character input", {
-  expect_equal(ans1, toy_reference)
-  expect_equal(ans2, brown_reference)
-})
-
-test_that("dispersion produces expected values, factor input", {
-  expect_equal(ans1_fact, toy_reference)
-  expect_equal(ans2_fact, brown_reference)
+test_that("values are consistent with Gries", {
+  expect_equal(x, ref, ignore_attr = TRUE)
 })
 
 test_that("minimal dp == dispersion(..., fun = \"dp\")", {
