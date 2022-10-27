@@ -42,21 +42,21 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dp</span><span class="op">(</span><span class="va">v</span>, <span class="va">tokens</span>, <span class="va">parts</span>, norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dp</span><span class="op">(</span><span class="va">tokens</span>, <span class="va">parts</span>, <span class="va">v</span>, norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>v</dt>
-<dd><p>integer vector with per document frequencies</p></dd>
-
-
-<dt>tokens</dt>
+    <dl><dt>tokens</dt>
 <dd><p>character or factor</p></dd>
 
 
 <dt>parts</dt>
 <dd><p>character or factor</p></dd>
+
+
+<dt>v</dt>
+<dd><p>integer vector with per document frequencies</p></dd>
 
 
 <dt>norm</dt>
@@ -80,15 +80,15 @@
 <span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">parts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">dp</span><span class="op">(</span><span class="va">v</span>, <span class="va">tokens</span>, <span class="va">parts</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          p          s          y          i          o          n          q </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.84147795 0.84147795 0.37604291 0.07631413 0.56721231 0.19257052 0.33415746 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          f          r          j          v          t          z          b </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.29437655 0.44517282 0.84147795 0.57743564 0.36146298 0.91060787 0.34456641 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          l          d          h          m          e          x          k </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.64222884 0.74114149 0.13581492 0.53456496 0.91060787 0.91060787 1.00000000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          a          c          w </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.73789659 0.37604291 0.91060787 </span>
+<span class="r-in"><span><span class="fu">dp</span><span class="op">(</span><span class="va">tokens</span>, <span class="va">parts</span>, <span class="va">v</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             u             y             k             j             z </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -6.723216e-17 -1.344643e-16  3.735395e-01  5.310825e-01  4.390497e-01 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             s             w             o             m             d </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7.888532e-01  3.468000e-02  8.463539e-01  3.027544e-02  2.111468e-01 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             r             v             b             x             a </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -6.723216e-17  5.310825e-01  5.310825e-01  5.368104e-01  1.201960e-02 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             q             p             e             t             g </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6.800643e-01  1.000000e+00  5.025647e-01  1.000000e+00  4.111670e-01 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
