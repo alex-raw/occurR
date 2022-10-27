@@ -2,17 +2,33 @@
 % Please edit documentation in R/dispersion.R
 \name{dispersion}
 \alias{dispersion}
+\alias{dispersion.data.frame}
+\alias{dispersion.data.table}
+\alias{dispersion.table}
+\alias{dispersion.default}
 \title{Calculate word dispersion measures}
 \usage{
 dispersion(.x, ...)
+
+\method{dispersion}{data.frame}(.x, tokens, parts, v, fun, ...)
+
+\method{dispersion}{data.table}(.x, tokens, parts, v, fun, ...)
+
+\method{dispersion}{table}(.x, ...)
+
+\method{dispersion}{default}(.x, tokens, parts, v, fun, lexicon, ...)
 }
 \arguments{
-\item{v}{integer. counts}
+\item{.x}{data.frame or list containing data}
+
+\item{...}{further arguments to be passed to or from other methods}
 
 \item{tokens}{character or factor. token}
 
 \item{parts}{character or factor.
 part id where a part is usually text or text region.}
+
+\item{v}{integer. counts}
 
 \item{fun}{(named) character or list.}
 

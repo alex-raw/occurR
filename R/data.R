@@ -31,17 +31,17 @@
 #' @references Justeson, John S., and Slava M. Katz. "Co-occurrences of antonymous adjectives and their contexts." Computational linguistics 17.1 (1991): 1-20.
 #'
 #' @format A data frame with five variables, and two attributes:
+#' attribute corpus_size contains the number of tokens in the whole corpus
+#' attribute unique_jj contains the number of tokens tagged as adjectives
+#' (jj.*) in the whole corpus
+#'
 #' \describe{
 #' \item{\code{word}}{first adjective}
 #' \item{\code{collocate}}{second adjective}
 #' \item{\code{o11}}{frequency of co-occurrence of `word` and `collocate`}
 #' \item{\code{f1}}{frequency of `word`}
 #' \item{\code{f2}}{frequency of `collocate`}
-#' \item{\code{attr(*, "corpus_size")}}{number of tokens in the whole corpus}
-#' \item{\code{attr(*, "unique_jj")}}{number of tokens tagged as adjectives
-#' (jj.*) in the whole corpus}
 #' }
-#'
 #' @examples
 #'
 #' data(adjective_cooccurrence)

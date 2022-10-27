@@ -6,15 +6,16 @@
 \title{Adjective co-occurrence}
 \format{
 A data frame with five variables, and two attributes:
+attribute corpus_size contains the number of tokens in the whole corpus
+attribute unique_jj contains the number of tokens tagged as adjectives
+(jj.*) in the whole corpus
+
 \describe{
 \item{\code{word}}{first adjective}
 \item{\code{collocate}}{second adjective}
 \item{\code{o11}}{frequency of co-occurrence of \code{word} and \code{collocate}}
 \item{\code{f1}}{frequency of \code{word}}
 \item{\code{f2}}{frequency of \code{collocate}}
-\item{\code{attr(*, "corpus_size")}}{number of tokens in the whole corpus}
-\item{\code{attr(*, "unique_jj")}}{number of tokens tagged as adjectives
-(jj.*) in the whole corpus}
 }
 }
 \usage{

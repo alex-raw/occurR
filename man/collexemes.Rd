@@ -2,11 +2,27 @@
 % Please edit documentation in R/assoc.R
 \name{collexemes}
 \alias{collexemes}
+\alias{collexemes.data.frame}
+\alias{collexemes.matrix}
+\alias{collexemes.data.table}
+\alias{collexemes.default}
 \title{Association measures for collocation and collostruction}
 \usage{
 collexemes(.x, ...)
+
+\method{collexemes}{data.frame}(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...)
+
+\method{collexemes}{matrix}(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...)
+
+\method{collexemes}{data.table}(.x, ...)
+
+\method{collexemes}{default}(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...)
 }
 \arguments{
+\item{.x}{data.frame or list containing data}
+
+\item{...}{further arguments to be passed to or from other methods}
+
 \item{o11}{numeric vector with joint frequencies}
 
 \item{f1}{numeric vector}

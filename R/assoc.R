@@ -3,6 +3,7 @@
 #' Calculates association measures from vectors of frequencies and
 #' joint frequencies.
 #'
+#' @param .x data.frame or list containing data
 #' @param o11 numeric vector with joint frequencies
 #' @param f1 numeric vector
 #' @param f2 numeric, if not provided, sum of o11 is used
@@ -12,6 +13,7 @@
 #' they are used in the output
 #' @param flip character names of measures for which to flip the sign, intended
 #' to signify negative association with two-sided measures
+#' @param ... further arguments to be passed to or from other methods
 #'
 #' @return matrix
 #' @details TODO:
@@ -19,6 +21,8 @@
 #' @export
 collexemes <- \(.x, ...) UseMethod("collexemes")
 
+#' @rdname collexemes
+#' @export
 collexemes.data.frame <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
                                   flip = NULL, ...) {
   res <- collexemes.default(
@@ -34,6 +38,7 @@ collexemes.data.frame <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
   res
 }
 
+#' @rdname collexemes
 #' @export
 collexemes.matrix <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
                                   flip = NULL, ...) {
@@ -42,27 +47,36 @@ collexemes.matrix <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
     f1 = .x[, eval(substitute(f1))],
     f2 = if (!is.null(f2)) .x[, eval(substitute(f2))],
     n = if (!is.null(n)) .x[, eval(substitute(n))],
-    fun = fun, flip = flip
+    fun = fun,
+    flip = flip
   )
   # rownames(res) <- rownames(.x)
   # colnames(res) <- colnames(.x)
   res
 }
 
+#' @rdname collexemes
 #' @export
 collexemes.data.table <- function(.x, ...) {
   # TODO:
   collexemes.default(o11, f1, f2, n)
 }
 
+#' @rdname collexemes
 #' @export
-collexemes.default <- function(o11, f1, f2 = NULL, n = NULL, fun,
-                               flip = NULL) {
+collexemes.default <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
+                               flip = NULL, ...) {
+  coll(o11 = o11, f1 = f1, f2 = f2, n = n, fun = fun, flip = flip, ...)
+}
+
+coll <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll",
+                               flip = NULL, ...) {
   if (is.null(f2)) f2 <- sum(o11)
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
 
-  vars <- extract_vars(fun, builtin_assoc())
+  exprs <- builtin_assoc()
+  if (is.character(fun)) check_funs(fun, exprs)
 
   stopifnot(
     is.character(flip) || is.null(flip),
@@ -79,14 +93,12 @@ collexemes.default <- function(o11, f1, f2 = NULL, n = NULL, fun,
     all(o11 <= n)
   )
 
-  list(f1 = f1, o11 = o11, f2 = f2, n = n) |>
-    coll(vars, flip)
-}
-
-coll <- function(.x, vars, flip = NULL) {
-  if (any(lengths(.x) == 0)) return(numeric(0))
+  if (!length(f1)) return(numeric(0))
 
   w <- ""
+  vars <- extract_vars(fun, exprs)
+  .x <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
+
   ans <- eval_exprs(.x, vars) |>
     withCallingHandlers(warning = \(w) w <<- w$message) |>
     suppressWarnings()
@@ -100,9 +112,10 @@ coll <- function(.x, vars, flip = NULL) {
 
   if (is.null(flip)) return(ans)
 
-  repulsed <- .x$o11 < .x$f1 * .x$f2 / .x$n
+  repulsed <- o11 < f1 * f2 / n
   two_sided <- colnames(ans) %in% flip
   ans[repulsed, two_sided] <- -ans[repulsed, two_sided]
   ans
 }
 
+utils::globalVariables(c("f1", "f2", "o11", "n"))

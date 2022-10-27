@@ -1,11 +1,12 @@
 every <- Filter(\(x) x != "kld.norm", available_measures("disp"))
-.read_table <- function(path, ...)
+.read_table <- function(path, ...) {
   utils::read.table(path, sep = "\t", na = "", quote = "", ..., header = TRUE)
+}
 
 data(brown)
 x <- table(brown[, c("doc_id", "word")]) |>
   as.data.frame(responseName = "v") |>
-  with(dispersion(word, doc_id, v, fun = every))
+  dispersion(word, doc_id, v, fun = every)
 
 ref <- .read_table("test_data_dispersion.tsv")[, colnames(x)]
 
@@ -29,14 +30,14 @@ test_that("minimal dp == dispersion(..., fun = \"dp\")", {
   tokens <- sample(letters, n, replace = TRUE)
   parts <- sample(LETTERS[1:3], n, replace = TRUE)
 
-  big <- dispersion(tokens, parts, v, "dp")
+  big <- disp(tokens, parts, v, "dp")
   big <- big[order(big$types), ]
   big <- setNames(big$dp, big$types)
   mini <- dp(tokens, parts, v, norm = FALSE)
   mini <- mini[order(names(mini))]
   expect_equal(mini, big)
 
-  big <- dispersion(tokens, parts, v, "dp.norm")
+  big <- disp(tokens, parts, v, "dp.norm")
   big <- big[order(big$types), ]
   big <- setNames(big$dp, big$types)
   mini <- dp(tokens, parts, v, norm = TRUE)

@@ -52,16 +52,12 @@ gather_vars <- function(labels, exprs) {
 }
 
 extract_vars <- function(fun, exprs) {
-  if (is.character(fun)) check_funs(fun, exprs)
-
   if (is.expression(fun)) {
     exprs <- c(exprs, fun)
     fun <- names(fun)
   }
 
-  out <- gather_vars(fun, exprs)
-  attr(out, "labels") <- fun
-  out
+  structure(gather_vars(fun, exprs), labels = fun)
 }
 
 eval_exprs <- function(x, exprs) {

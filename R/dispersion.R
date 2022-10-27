@@ -1,5 +1,6 @@
 #' Calculate word dispersion measures
 #'
+#' @param .x data.frame or list containing data
 #' @param v integer. counts
 #' @param tokens character or factor. token
 #' @param parts character or factor.
@@ -7,30 +8,44 @@
 #' @param fun (named) character or list.
 #' @param lexicon character. optional list of words to match. can be used
 #' for clean up and speed up
+#' @param ... further arguments to be passed to or from other methods
 #'
 #' @export
 dispersion <- \(.x, ...) UseMethod("dispersion")
 
+#' @rdname dispersion
 #' @export
-dispersion.data.frame <- function(.x, ...) {
-  # TODO:
-  dispersion.default(tokens, parts, v, fun, lexicon)
+dispersion.data.frame <- function(.x, tokens, parts, v, fun, ...) {
+  disp(
+    tokens = eval(substitute(tokens), .x),
+    parts = eval(substitute(parts), .x),
+    v = eval(substitute(v), .x),
+    fun = fun,
+    ...
+  )
 }
 
+#' @rdname dispersion
 #' @export
-dispersion.data.table <- function(.x, ...) {
+dispersion.data.table <- function(.x, tokens, parts, v, fun, ...) {
   # TODO:
-  dispersion.default(tokens, parts, v, fun, lexicon)
+  # disp(tokens, parts, v, fun, lexicon)
 }
 
+#' @rdname dispersion
 #' @export
 dispersion.table <- function(.x, ...) {
   # TODO:
-  dispersion.default(tokens, parts, v, fun, lexicon)
+  # disp(tokens, parts, v, fun, lexicon)
 }
 
+#' @rdname dispersion
 #' @export
-dispersion.default <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL) {
+dispersion.default <- function(.x, tokens, parts, v, fun, lexicon, ...) {
+  disp(tokens = tokens, parts = parts, v = v, fun = fun, lexicon = lexicon)
+}
+
+disp <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL) {
   stopifnot(
     is.numeric(v),
     class(tokens) %in% c("character", "factor", "numeric"),
@@ -52,3 +67,5 @@ dispersion.default <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL
   if (!is.null(names(fun))) names(ans) <- names(fun)
   data.frame(types = levels(tokens), ans)
 }
+
+utils::globalVariables(c("tokens", "parts", "v", "lexicon"))
