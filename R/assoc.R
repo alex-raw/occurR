@@ -19,9 +19,34 @@
 #' @export
 collexemes <- \(.x, ...) UseMethod("collexemes")
 
-collexemes.data.frame <- function(.x, ...) {
-  # TODO:
-  collexemes.default(o11, f1, f2, n)
+collexemes.data.frame <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
+                                  flip = NULL, ...) {
+  res <- collexemes.default(
+    o11 = eval(substitute(o11), .x),
+    f1 = eval(substitute(f1), .x),
+    f2 = if (!is.null(f2)) eval(substitute(f2), .x),
+    n = if (!is.null(n)) eval(substitute(n), .x),
+    fun = fun,
+    flip = flip
+  )
+  # rownames(res) <- rownames(.x)
+  # colnames(res) <- colnames(.x)
+  res
+}
+
+#' @export
+collexemes.matrix <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
+                                  flip = NULL, ...) {
+  res <- collexemes.default(
+    o11 = .x[, eval(substitute(o11))],
+    f1 = .x[, eval(substitute(f1))],
+    f2 = if (!is.null(f2)) .x[, eval(substitute(f2))],
+    n = if (!is.null(n)) .x[, eval(substitute(n))],
+    fun = fun, flip = flip
+  )
+  # rownames(res) <- rownames(.x)
+  # colnames(res) <- colnames(.x)
+  res
 }
 
 #' @export
@@ -31,13 +56,9 @@ collexemes.data.table <- function(.x, ...) {
 }
 
 #' @export
-collexemes.table <- function(.x, ...) {
-  # TODO:
-  collexemes.default(o11, f1, f2, n)
-}
-
-collexemes.default <- function(o11, f1, f2 = sum(o11), n = NULL,
-                       fun = "ll", flip = NULL) {
+collexemes.default <- function(o11, f1, f2 = NULL, n = NULL, fun,
+                               flip = NULL) {
+  if (is.null(f2)) f2 <- sum(o11)
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
 

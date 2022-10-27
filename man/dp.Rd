@@ -4,14 +4,14 @@
 \alias{dp}
 \title{Deviation of proportions}
 \usage{
-dp(v, tokens, parts, norm = TRUE)
+dp(tokens, parts, v, norm = TRUE)
 }
 \arguments{
-\item{v}{integer vector with per document frequencies}
-
 \item{tokens}{character or factor}
 
 \item{parts}{character or factor}
+
+\item{v}{integer vector with per document frequencies}
 
 \item{norm}{logical whether or not to normalize, see Details}
 }
@@ -29,6 +29,6 @@ n <- 50
 v <- sample(1:100, n, replace = TRUE)
 tokens <- sample(letters, n, replace = TRUE)
 parts <- sample(LETTERS[1:3], n, replace = TRUE)
-dp(v, tokens, parts)
+dp(tokens, parts, v)
 
 }

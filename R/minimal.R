@@ -71,10 +71,10 @@ dwg <- function(cpos, f, size, corr = TRUE) { # word growth dispersion
 #' v <- sample(1:100, n, replace = TRUE)
 #' tokens <- sample(letters, n, replace = TRUE)
 #' parts <- sample(LETTERS[1:3], n, replace = TRUE)
-#' dp(v, tokens, parts)
+#' dp(tokens, parts, v)
 #'
 #' @export
-dp <- function(v, tokens, parts, norm = TRUE) {
+dp <- function(tokens, parts, v, norm = TRUE) {
   tokens <- as.factor(tokens)
   parts <- as.factor(parts)
   f <- rowsum(v, tokens)[tokens, ]

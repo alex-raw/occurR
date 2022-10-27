@@ -9,3 +9,4 @@ Session.vim
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^data-raw$

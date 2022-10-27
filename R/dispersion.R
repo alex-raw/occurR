@@ -14,23 +14,23 @@ dispersion <- \(.x, ...) UseMethod("dispersion")
 #' @export
 dispersion.data.frame <- function(.x, ...) {
   # TODO:
-  dispersion.default(v, tokens, parts, fun, lexicon)
+  dispersion.default(tokens, parts, v, fun, lexicon)
 }
 
 #' @export
 dispersion.data.table <- function(.x, ...) {
   # TODO:
-  dispersion.default(v, tokens, parts, fun, lexicon)
+  dispersion.default(tokens, parts, v, fun, lexicon)
 }
 
 #' @export
 dispersion.table <- function(.x, ...) {
   # TODO:
-  dispersion.default(v, tokens, parts, fun, lexicon)
+  dispersion.default(tokens, parts, v, fun, lexicon)
 }
 
 #' @export
-dispersion.default <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL) {
+dispersion.default <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL) {
   stopifnot(
     is.numeric(v),
     class(tokens) %in% c("character", "factor", "numeric"),
@@ -39,12 +39,13 @@ dispersion.default <- function(v, tokens, parts, fun = "dp.norm", lexicon = NULL
     "missing values in `v`" = !anyNA(v)
   )
 
-  # TODO: check what happens if v = 0. might get nonsensical results
   # TODO: return length 0 data with length 0 input
 
+  non_zero <- v != 0
   vars <- extract_vars(fun, builtin_disp())
   tokens <- as_factor(tokens, lexicon)
-  ans <- list(parts = parts, i = tokens, v = as.numeric(v)) |>
+  ans <- data.frame(parts = parts, i = tokens, v = as.numeric(v))[non_zero, ] |>
+    as.list() |>
     eval_exprs(vars)
   ans <- ans[c("f", fun)]
 
