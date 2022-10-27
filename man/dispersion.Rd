@@ -4,15 +4,15 @@
 \alias{dispersion}
 \title{Calculate word dispersion measures}
 \usage{
-dispersion(v, tokens, parts, fun = "dp.norm", lexicon = NULL)
+dispersion(tokens, parts, v, fun = "dp.norm", lexicon = NULL)
 }
 \arguments{
-\item{v}{integer. counts}
-
 \item{tokens}{character or factor. token}
 
 \item{parts}{character or factor.
 part id where a part is usually text or text region.}
+
+\item{v}{integer. counts}
 
 \item{fun}{(named) character or list.}
 

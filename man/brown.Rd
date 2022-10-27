@@ -22,6 +22,7 @@ The the raw README and CONTENTS files are also included as attributes.
 }
 \examples{
 
+data(brown)
 head(brown)
 
 class(attr(brown, "README"))

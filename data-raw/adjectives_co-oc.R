@@ -40,5 +40,5 @@ get_cooccurrence <- function(corpus, tag) {
 
 data(brown)
 
-adjective_cooccurrence <- get_cooccurrence(brown, pos = "jj")
+adjective_cooccurrence <- get_cooccurrence(brown, tag = "^jj")
 usethis::use_data(adjective_cooccurrence, overwrite = TRUE)
