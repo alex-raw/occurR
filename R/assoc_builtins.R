@@ -30,7 +30,6 @@ builtin_assoc <- function() {
       stats::phyper(o11, c1, c2, r1)
     )),
     poisson_pv = -log10(stats::pgamma(e11, o11)),
-    t_score = (o11 - e11) / sqrt(o11),
     rel_risk = log10((o11 * c2) / (o12 * c1)),
     liddell = (n * (o11 - e11)) / (c1 * c2),
     gmean = o11 / sqrt(n * e11),
@@ -41,8 +40,9 @@ builtin_assoc <- function() {
     chisq = (n * ((o11 - e11)^2)) / (e11 * e22),
     chisq_i = rowSums(((o - e)^2) / e, na.rm = TRUE),
     chisq_h = n * (o11 * o22 - o12 * o21)^2 / prod(r1, r2, c1, c2),
-    chisq_corr = (n * (abs(o11 * o22 - o12 * o21) - n / 2)^2) /
-      prod(r1, r2, c1, c2),
+    chisq_corr = (n * (abs(o11 * o22 - o12 * o21) - n / 2)^2) / prod(r1, r2, c1, c2),
+    pearsonsid = (o11 - e11) / sqrt(e11),
+    t_score = (o11 - e11) / sqrt(o11),
     cramer = sqrt(chisq / n),
     min_sens = ifelse((o11 / r1) < (o11 / c1), o11 / r1, o11 / c1),
     poisson_stirling = o11 * (log10(o11) - log10(e11) - 1),

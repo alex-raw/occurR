@@ -106,7 +106,6 @@ test_that("values consistent with Gries's `Coll.analysis 4.0`", {
     data.frame(type = "OTHER", o11 = 0, f1 = n - sum(ref_data_gries$o11))
   )
   test_data_gries <- collexemes(input, o11, f1, n = n, fun = m)
-
   implemented <- intersect(available_measures("assoc"), colnames(ref_data_gries))
 
   expect_equal(

@@ -33,7 +33,8 @@ collexemes.data.frame <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
     fun = fun,
     flip = flip
   )
-  cbind(type = Filter(is.character, .x), res[, fun])
+  res <- cbind(Filter(is.character, .x), res)
+  res
 }
 
 #' @rdname collexemes
@@ -67,8 +68,7 @@ collexemes.default <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
   coll(o11 = o11, f1 = f1, f2 = f2, n = n, fun = fun, flip = flip, ...)
 }
 
-coll <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll",
-                               flip = NULL, ...) {
+coll <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...) {
   if (is.null(f2)) f2 <- sum(o11)
   min_n <- sum(f1 + f2)
   if (is.null(n)) n <- min_n
@@ -93,10 +93,10 @@ coll <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll",
 
   if (!length(f1)) return(numeric(0))
 
-  w <- ""
   vars <- extract_vars(fun, exprs)
   .x <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
 
+  w <- ""
   ans <- eval_exprs(.x, vars) |>
     withCallingHandlers(warning = \(w) w <<- w$message) |>
     suppressWarnings()
