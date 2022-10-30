@@ -18,9 +18,9 @@ get_gries_dispersion <- function(corpus) {
 
   res <- cbind(rownames(res), res)
   colnames(res) <- c(
-    "types", "f", "range", "maxmin", "sd.pop", "cv.pop", "chisq", "D.eq", "D",
-    "S.eq", "S", "dc", "D2", "idf", "D3", "dp", "dp.norm", "kld", "U.eq",
-    "U", "f.R.eq", "f.R", "Um", "engvall", "Ur"
+    "types", "f", "range", "maxmin", "sd_pop", "cv_pop", "chisq", "D_eq", "D",
+    "S_eq", "S", "dc", "D2", "idf", "D3", "dp", "dp_norm", "kld", "U_eq",
+    "U", "f_R_eq", "f_R", "Um", "engvall", "Ur"
   )
 
   res[order(res$types), ]

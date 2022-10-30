@@ -1,4 +1,4 @@
-every <- Filter(\(x) x != "kld.norm", available_measures("disp"))
+every <- Filter(\(x) x != "kld_norm", available_measures("disp"))
 .read_table <- function(path, ...) {
   utils::read.table(path, sep = "\t", na = "", quote = "", ..., header = TRUE)
 }
@@ -37,7 +37,7 @@ test_that("minimal dp == dispersion(..., fun = \"dp\")", {
   mini <- mini[order(names(mini))]
   expect_equal(mini, big)
 
-  big <- disp(tokens, parts, v, "dp.norm")
+  big <- disp(tokens, parts, v, "dp_norm")
   big <- big[order(big$types), ]
   big <- setNames(big$dp, big$types)
   mini <- dp(tokens, parts, v, norm = TRUE)

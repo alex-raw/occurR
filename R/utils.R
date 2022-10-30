@@ -8,7 +8,6 @@
 #' The following collocation and association measures are currently available:
 #'
 #' \describe{
-#' \item{\code{ll}}{}
 #' \item{\code{ll}}{...}
 #' \item{\code{mi}}{...}
 #' \item{\code{mi2}}{...}

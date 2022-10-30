@@ -43,7 +43,7 @@ dispersion.default <- function(.x, tokens, parts, v, fun, ...) {
   disp(tokens = tokens, parts = parts, v = v, fun = fun)
 }
 
-disp <- function(tokens, parts, v, fun = "dp.norm") {
+disp <- function(tokens, parts, v, fun = "dp_norm") {
   stopifnot(
     is.numeric(v),
     class(tokens) %in% c("character", "factor", "numeric"),
