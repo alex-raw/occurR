@@ -6,8 +6,6 @@
 #' @param parts character or factor.
 #' part id where a part is usually text or text region.
 #' @param fun (named) character or list.
-#' @param lexicon character. optional list of words to match. can be used
-#' for clean up and speed up
 #' @param ... further arguments to be passed to or from other methods
 #'
 #' @export
@@ -29,23 +27,23 @@ dispersion.data.frame <- function(.x, tokens, parts, v, fun, ...) {
 #' @export
 dispersion.data.table <- function(.x, tokens, parts, v, fun, ...) {
   # TODO:
-  # disp(tokens, parts, v, fun, lexicon)
+  # disp(tokens, parts, v, fun)
 }
 
 #' @rdname dispersion
 #' @export
 dispersion.table <- function(.x, ...) {
   # TODO:
-  # disp(tokens, parts, v, fun, lexicon)
+  # disp(tokens, parts, v, fun)
 }
 
 #' @rdname dispersion
 #' @export
-dispersion.default <- function(.x, tokens, parts, v, fun, lexicon, ...) {
-  disp(tokens = tokens, parts = parts, v = v, fun = fun, lexicon = lexicon)
+dispersion.default <- function(.x, tokens, parts, v, fun, ...) {
+  disp(tokens = tokens, parts = parts, v = v, fun = fun)
 }
 
-disp <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL) {
+disp <- function(tokens, parts, v, fun = "dp.norm") {
   stopifnot(
     is.numeric(v),
     class(tokens) %in% c("character", "factor", "numeric"),
@@ -58,7 +56,7 @@ disp <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL) {
 
   non_zero <- v != 0
   vars <- extract_vars(fun, builtin_disp())
-  tokens <- as_factor(tokens, lexicon)
+  tokens <- as_factor(tokens)
   ans <- data.frame(parts = parts, i = tokens, v = as.numeric(v))[non_zero, ] |>
     as.list() |>
     eval_exprs(vars)
@@ -68,4 +66,4 @@ disp <- function(tokens, parts, v, fun = "dp.norm", lexicon = NULL) {
   data.frame(types = levels(tokens), ans)
 }
 
-utils::globalVariables(c("tokens", "parts", "v", "lexicon"))
+utils::globalVariables(c("tokens", "parts", "v"))

@@ -16,7 +16,7 @@ dispersion(.x, ...)
 
 \method{dispersion}{table}(.x, ...)
 
-\method{dispersion}{default}(.x, tokens, parts, v, fun, lexicon, ...)
+\method{dispersion}{default}(.x, tokens, parts, v, fun, ...)
 }
 \arguments{
 \item{.x}{data.frame or list containing data}
@@ -31,9 +31,6 @@ part id where a part is usually text or text region.}
 \item{v}{integer. counts}
 
 \item{fun}{(named) character or list.}
-
-\item{lexicon}{character. optional list of words to match. can be used
-for clean up and speed up}
 }
 \description{
 Calculate word dispersion measures

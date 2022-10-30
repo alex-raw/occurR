@@ -31,7 +31,7 @@ check_funs <- function(fun, exprs) {
   }
 }
 
-as_factor <- function(x, lex = NULL) {
+as_factor <- function(x) {
   if (is.factor(x)) return(x)
   if (is.numeric(x)) return(as.factor(x))
   kit::charToFact(x, nThread = parallel::detectCores())
