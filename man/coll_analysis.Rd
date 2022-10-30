@@ -77,7 +77,7 @@ Matrix input currently requires column names "o11", "f1", "f2", "n"
 data(adjective_cooccurrence)
 .x <- subset(adjective_cooccurrence, word != collocate)
 n <- attr(adjective_cooccurrence, "corpus_size")
-res <- coll_analysis(adjective_cooccurrence, o11, f1, f2, n, fun = "ll")
+res <- coll_analysis(.x, o11, f1, f2, n, fun = "ll")
 res[order(res$ll, decreasing = TRUE), ] |> head()
 
 # if arguments match column names, they can be used explicitely
@@ -85,8 +85,7 @@ c("o11", "f1", "f2") \%in\% names(.x) # TRUE
 coll_analysis(.x, n = n, fun = "ll") |>
   head()
 
-# control names of output columns by list names
-mi_base2 <- \(o11, e11) log2(o11 / e11)
+# control names of output columns by using a named list
 coll_analysis(.x, o11, f1, f2, n, fun = list(logl = "ll")) |>
   head()
 

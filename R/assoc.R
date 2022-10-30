@@ -43,7 +43,7 @@
 #' data(adjective_cooccurrence)
 #' .x <- subset(adjective_cooccurrence, word != collocate)
 #' n <- attr(adjective_cooccurrence, "corpus_size")
-#' res <- coll_analysis(adjective_cooccurrence, o11, f1, f2, n, fun = "ll")
+#' res <- coll_analysis(.x, o11, f1, f2, n, fun = "ll")
 #' res[order(res$ll, decreasing = TRUE), ] |> head()
 #'
 #' # if arguments match column names, they can be used explicitely
@@ -51,8 +51,7 @@
 #' coll_analysis(.x, n = n, fun = "ll") |>
 #'   head()
 #'
-#' # control names of output columns by list names
-#' mi_base2 <- \(o11, e11) log2(o11 / e11)
+#' # control names of output columns by using a named list
 #' coll_analysis(.x, o11, f1, f2, n, fun = list(logl = "ll")) |>
 #'   head()
 #'
@@ -89,8 +88,9 @@ coll_analysis.data.frame <- function(.x, o11 = NULL, f1 = NULL, f2 = NULL,
   }
 
   res <- assoc(o11 = o11, f1 = f1, f2 = f2, n = n, fun = fun, flip = flip)
-  cbind(types = Filter(\(x) is.character(x) || is.factor(x), .x), res)
+  cbind(Filter(\(x) is.character(x) || is.factor(x), .x), res)
 }
+
 
 # TODO: version for true contingency tables? where o12 and o21 are given?
 #' @rdname coll_analysis
