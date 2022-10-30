@@ -24,7 +24,8 @@ builtin_assoc <- function() {
     mi = log10(o11 / e11),
     mi2 = log10(o11^2 / e11),
     mi3 = log10(o11^3 / e11),
-    mi_conf = log10(stats::pgamma(-alpha - log10(2), o11, log = TRUE) / log(10) / e11),
+    # TODO: NaNs...need to get a valid data set from UCS/R to reverse engineer
+    # mi_conf = log10(stats::pgamma(-alpha - log10(2), o11, log = TRUE) / log(10) / e11),
     fye = -log10(ifelse(o11 > e11,
       stats::phyper(o11 - 1, c1, c2, r1, lower = FALSE),
       stats::phyper(o11, c1, c2, r1)
