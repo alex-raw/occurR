@@ -2,7 +2,7 @@ pandoc: 2.7.3
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-10-29T17:03Z
+last_built: 2022-10-30T20:05Z
 urls:
   reference: https://alex-raw.github.io/occurR/reference
   article: https://alex-raw.github.io/occurR/articles
