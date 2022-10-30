@@ -136,63 +136,62 @@ column name. It is recommended to pass the columns explicitly.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">adjective_cooccurrence</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">.x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">adjective_cooccurrence</span>, <span class="va">word</span> <span class="op">!=</span> <span class="va">collocate</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">adjective_cooccurrence</span>, <span class="st">"corpus_size"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">coll_analysis</span><span class="op">(</span><span class="va">adjective_cooccurrence</span>, <span class="va">o11</span>, <span class="va">f1</span>, <span class="va">f2</span>, <span class="va">n</span>, fun <span class="op">=</span> <span class="st">"ll"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">coll_analysis</span><span class="op">(</span><span class="va">.x</span>, <span class="va">o11</span>, <span class="va">f1</span>, <span class="va">f2</span>, <span class="va">n</span>, fun <span class="op">=</span> <span class="st">"ll"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">ll</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       types.word types.collocate       ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24           new             new 555.2776</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3953    economic          social 429.3335</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 346     economic       political 366.6125</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1583    catholic           roman 294.1170</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4240   political          social 286.6264</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34605     fiscal         uniform 277.0459</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            word collocate       ll</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3953   economic    social 429.3335</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 346    economic political 366.6125</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1583   catholic     roman 294.1170</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4240  political    social 286.6264</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34605    fiscal   uniform 277.0459</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2168      black     white 256.3603</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># if arguments match column names, they can be used explicitely</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"o11"</span>, <span class="st">"f1"</span>, <span class="st">"f2"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE TRUE TRUE</span>
 <span class="r-in"><span><span class="fu">coll_analysis</span><span class="op">(</span><span class="va">.x</span>, n <span class="op">=</span> <span class="va">n</span>, fun <span class="op">=</span> <span class="st">"ll"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    types.word types.collocate        ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand          recent  7.983294</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive        over-all 13.500985</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible        superior 15.837249</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought        superior 17.566465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought        possible 13.312133</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative            such 20.512751</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          word collocate        ll</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand    recent  7.983294</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive  over-all 13.500985</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible  superior 15.837249</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought  superior 17.566465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought  possible 13.312133</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative      such 20.512751</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># control names of output columns by list names</span></span></span>
-<span class="r-in"><span><span class="va">mi_base2</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">o11</span>, <span class="va">e11</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">o11</span> <span class="op">/</span> <span class="va">e11</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># control names of output columns by using a named list</span></span></span>
 <span class="r-in"><span><span class="fu">coll_analysis</span><span class="op">(</span><span class="va">.x</span>, <span class="va">o11</span>, <span class="va">f1</span>, <span class="va">f2</span>, <span class="va">n</span>, fun <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>logl <span class="op">=</span> <span class="st">"ll"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    types.word types.collocate      logl</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand          recent  7.983294</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive        over-all 13.500985</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible        superior 15.837249</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought        superior 17.566465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought        possible 13.312133</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative            such 20.512751</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          word collocate      logl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand    recent  7.983294</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive  over-all 13.500985</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible  superior 15.837249</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought  superior 17.566465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought  possible 13.312133</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative      such 20.512751</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># using custom function</span></span></span>
 <span class="r-in"><span><span class="va">mi_base2</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">o11</span>, <span class="va">e11</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">o11</span> <span class="op">/</span> <span class="va">e11</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">coll_analysis</span><span class="op">(</span><span class="va">.x</span>, <span class="va">o11</span>, <span class="va">f1</span>, <span class="va">f2</span>, <span class="va">n</span>, fun <span class="op">=</span> <span class="va">mi_base2</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    types.word types.collocate  mi_base2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand          recent  7.171506</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive        over-all 11.111001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible        superior  7.108428</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought        superior 13.655322</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought        possible 10.600281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative            such  6.306594</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          word collocate  mi_base2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand    recent  7.171506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive  over-all 11.111001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible  superior  7.108428</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought  superior 13.655322</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought  possible 10.600281</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative      such  6.306594</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># mix built-in measures with custom functions</span></span></span>
 <span class="r-in"><span><span class="fu">coll_analysis</span><span class="op">(</span><span class="va">.x</span>, n <span class="op">=</span> <span class="va">n</span>, fun <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>builtin <span class="op">=</span> <span class="st">"ll"</span>, custom <span class="op">=</span> <span class="va">mi_base2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    types.word types.collocate   builtin    custom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand          recent  7.983294  7.171506</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive        over-all 13.500985 11.111001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible        superior 15.837249  7.108428</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought        superior 17.566465 13.655322</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought        possible 13.312133 10.600281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative            such 20.512751  6.306594</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          word collocate   builtin    custom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       grand    recent  7.983294  7.171506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   executive  over-all 13.500985 11.111001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    possible  superior 15.837249  7.108428</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 hard-fought  superior 17.566465 13.655322</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 hard-fought  possible 13.312133 10.600281</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    relative      such 20.512751  6.306594</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
