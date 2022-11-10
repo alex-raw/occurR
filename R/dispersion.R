@@ -2,8 +2,10 @@
 #'
 #' @param .x data.frame or list containing data
 #' @param v integer. counts
-#' @param tokens character or factor. token
-#' @param parts character or factor.
+#' @param tokens character or factor; for table method, character specifying
+#' dimname; for data.frame method, expression specifying the column
+#' @param parts character or factor; for table method, character specifying
+#' dimname; for data.frame method, expression specifying the column
 #' part id where a part is usually text or text region.
 #' @param fun (named) character or list.
 #' @param ... further arguments to be passed to or from other methods
@@ -25,16 +27,9 @@ dispersion.data.frame <- function(.x, tokens, parts, v, fun, ...) {
 
 #' @rdname dispersion
 #' @export
-dispersion.data.table <- function(.x, tokens, parts, v, fun, ...) {
-  # TODO:
-  # disp(tokens, parts, v, fun)
-}
-
-#' @rdname dispersion
-#' @export
-dispersion.table <- function(.x, ...) {
-  # TODO:
-  # disp(tokens, parts, v, fun)
+dispersion.table <- function(.x, tokens, parts, ...) {
+  .df <- as.data.frame(.x, responseName = "v")
+  disp(tokens = .df[, tokens], parts = .df[, parts], v = .df[, "v"], ...)
 }
 
 #' @rdname dispersion

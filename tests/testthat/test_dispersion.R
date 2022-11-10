@@ -1,13 +1,23 @@
 every <- Filter(\(x) x != "kld_norm", available_measures("disp"))
 
 data(brown)
-x <- table(brown[, c("doc_id", "word")]) |>
-  as.data.frame(responseName = "v") |>
-  dispersion(word, doc_id, v, fun = every)
+x_table <- table(brown[, c("doc_id", "word")])
 
-ref <- .read_table("test_data_dispersion.tsv")[, colnames(x)]
+res_table <- dispersion(x_table, tokens = "word", parts = "doc_id", fun = every)
 
-x <- x[order(x$types), ][1:100, ]
+res_df <- as.data.frame(x_table, responseName = "v") |>
+  dispersion(tokens = word, parts = doc_id, v = v, fun = every)
+
+res_raw <- dispersion(brown, tokens = word, parts = doc_id, fun = every)
+
+test_that("table and data.frame methods are consistent", {
+  expect_identical(res_table, res_df)
+  expect_identical(res_raw, res_df)
+})
+
+ref <- .read_table("test_data_dispersion.tsv")[, colnames(res_df)]
+
+x <- res_df[order(res_df$types), ][1:100, ]
 ref <- ref[order(ref$types), ][1:100, ]
 
 

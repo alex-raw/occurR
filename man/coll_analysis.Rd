@@ -57,11 +57,11 @@ Calculates common association measures used to perform collocation or
 collostruction analysis for typical count data.
 }
 \details{
-For collocation analysis, f1 and f2 typically represent the corpus frequencies of
-the word and the collocate, respectively, i.e. frequencies of co-occurrence
-included. For collostruction analysis, f1 represents the corpus frequencies
-of the word, and f2 the construction frequency. In a contingency table, they
-represent marginal sums.
+For collocation analysis, f1 and f2 typically represent the corpus
+frequencies of the word and the collocate, respectively, i.e. frequencies of
+co-occurrence included. For collostruction analysis, f1 represents the corpus
+frequencies of the word, and f2 the construction frequency. In a contingency
+table, they represent marginal sums.
 Both the construction frequency \code{f2} and the corpus size \code{n} can be provided
 as vectors, which allows for efficient calculations over data from multiple
 constructions/corpora.
