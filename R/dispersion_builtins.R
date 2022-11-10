@@ -46,11 +46,6 @@ builtin_disp <- function() {
   )
 }
 
-sum_by <- function(f, n, g) {
-  stopifnot(length(f) > 0, length(n) > 0, length(g) > 0)
-  groupsum(g, n, f)
-}
-
 max_min0 <- function(x, group, n, range) {
   if (requireNamespace("collapse", quietly = TRUE)) {
     maxs <- collapse::fmax.default(x, group, use.g.names = FALSE, na.rm = FALSE)
@@ -76,8 +71,10 @@ carroll_d2 <- function(p, p_sum, group, n, N) { # nolint
 }
 
 kromer <- function(x, group, N) { # nolint
-  if (requireNamespace("Rfast", quietly = TRUE)) digamma <- Rfast::Digamma
-  sum_by(group, N, digamma(x + 1) - digamma(1))
+  .digamma <- if (requireNamespace("Rfast", quietly = TRUE))
+    Rfast::Digamma else digamma
+
+  sum_by(group, N, .digamma(x + 1) - .digamma(1))
 }
 
 sd_pop <- function(v, n, range, mean, group, N) { # nolint

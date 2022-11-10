@@ -1,7 +1,4 @@
 every <- Filter(\(x) x != "kld_norm", available_measures("disp"))
-.read_table <- function(path, ...) {
-  utils::read.table(path, sep = "\t", na = "", quote = "", ..., header = TRUE)
-}
 
 data(brown)
 x <- table(brown[, c("doc_id", "word")]) |>

@@ -97,33 +97,59 @@ as_factor <- function(x) {
   kit::charToFact(x, nThread = parallel::detectCores())
 }
 
+sum_by <- function(f, n, g) {
+  stopifnot(length(f) > 0, length(n) > 0, length(g) > 0)
+  groupsum(g, n, f)
+}
+
 # recursively get all variable names necessary to calculate intermediate and
 # final values from list of expressions; essentially traverse the AST
-gather_vars <- function(labels, exprs) {
-  out <- exprs[labels] |>
+gather_vars <- function(exprs, .labels) {
+  out <- exprs[.labels] |>
     all.vars() |>
-    union(labels)
+    union(.labels)
 
-  if (identical(labels, out)) {
+  if (identical(.labels, out)) {
     return(exprs[out])
   }
 
-  gather_vars(out, exprs)
+  gather_vars(exprs, out)
 }
 
-extract_vars <- function(fun, exprs) {
-  if (is.expression(fun)) {
-    exprs <- c(exprs, fun)
-    fun <- names(fun)
+get_occur <- function(fun, type, ...) {
+  .builtins <- switch(type, assoc = builtin_assoc(), disp = builtin_disp())
+
+  .labels <- switch(class(fun),
+    `character` = fun,
+    `function` = deparse1(substitute(fun)),
+    names(fun) # list or expression
+  )
+
+  if (is.null(.labels) || any(!nzchar(.labels))) {
+    stop("If `fun` is a list, all elements have to be named")
   }
 
-  structure(gather_vars(fun, exprs), labels = fun)
+  exprs <- lapply(fun, \(x) switch(class(x),
+    `character` = {
+      check_funs(x, .builtins)
+      .builtins[[x]]
+    },
+    `function` = body(x),
+    x
+  )) |>
+    c(.builtins) |>
+    gather_vars(.labels)
+
+  if (!is.list(fun) && !is.character(fun)) fun <- list(fun)
+
+  evalapply(list(...), exprs)[.labels]
 }
 
-eval_exprs <- function(x, exprs) {
+evalapply <- function(x, exprs) {
   for (i in names(exprs)) {
     x[[i]] <- eval(exprs[[i]], x)
   }
 
   x
 }
+

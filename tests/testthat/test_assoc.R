@@ -1,7 +1,4 @@
-.read_table <- \(...) utils::read.table(..., sep = "\t", na = "", quote = "",
-                                        header = TRUE)
 measures <- builtin_assoc()
-
 
 test_that("assoc builtins", {
   expect_type(measures, "expression")
