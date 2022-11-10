@@ -87,7 +87,14 @@ coll_analysis.data.frame <- function(.x, o11 = NULL, f1 = NULL, f2 = NULL,
          "data.frame or specified explicitely")
   }
 
-  res <- assoc(o11 = o11, f1 = f1, f2 = f2, n = n, fun = fun, flip = flip)
+  res <- assoc(
+    o11 = as.numeric(o11),
+    f1 = as.numeric(f1),
+    f2 = if (!is.null(f2)) as.numeric(f2),
+    n = if (!is.null(n)) as.numeric(n),
+    fun = fun,
+    flip = flip
+  )
   cbind(Filter(\(x) is.character(x) || is.factor(x), .x), res)
 }
 
@@ -143,43 +150,22 @@ assoc <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...) {
     is.list(fun) || is.character(fun) || is.expression(fun) || is.function(fun)
   )
 
-  .labels <- switch(class(fun),
-    `character` = fun,
-    `function` = deparse1(substitute(fun)),
-    names(fun) # list or expression
-  )
-
-  if (is.null(.labels) || any(!nzchar(.labels))) {
-    stop("If `fun` is a list, all elements have to be named")
+  if (!length(f1)) {
+    return(numeric(0))
   }
 
-  .builtins <- builtin_assoc()
-  if (!is.list(fun) && !is.character(fun)) fun <- list(fun)
-  exprs <- lapply(fun, \(x) switch(class(x),
-    `character` = {
-      check_funs(x, .builtins)
-      .builtins[[x]]
-    },
-    `function` = body(x),
-    x
+  ans <- do.call(cbind, get_occur(
+    fun = fun,
+    type = "assoc",
+    f1 = f1,
+    o11 = o11,
+    f2 = f2,
+    n = n
   ))
 
-  names(exprs) <- .labels
-  exprs <- c(.builtins, unlist(exprs))
-  vars <- gather_vars(.labels, exprs)
-
-  if (!length(f1)) return(numeric(0))
-
-  ans <- eval_exprs(list(
-    f1 = as.numeric(f1),
-    o11 = as.numeric(o11),
-    f2 = as.numeric(f2),
-    n = as.numeric(n)
-  ), vars)
-
-  ans <- do.call(cbind, ans[.labels])
-
-  if (is.null(flip)) return(ans)
+  if (is.null(flip)) {
+    return(ans)
+  }
 
   repulsed <- o11 < f1 * f2 / n
   two_sided <- colnames(ans) %in% flip

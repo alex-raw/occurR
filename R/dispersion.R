@@ -15,7 +15,7 @@ dispersion <- \(.x, ...) UseMethod("dispersion")
 
 #' @rdname dispersion
 #' @export
-dispersion.data.frame <- function(.x, tokens, parts, v, fun, ...) {
+dispersion.data.frame <- function(.x, tokens, parts, v = NULL, fun = "dp_norm", ...) {
   disp(
     tokens = eval(substitute(tokens), .x),
     parts = eval(substitute(parts), .x),
@@ -38,27 +38,37 @@ dispersion.default <- function(.x, tokens, parts, v, fun, ...) {
   disp(tokens = tokens, parts = parts, v = v, fun = fun)
 }
 
-disp <- function(tokens, parts, v, fun = "dp_norm") {
+disp <- function(tokens, parts, v = NULL, fun = "dp_norm") {
   stopifnot(
-    is.numeric(v),
+    is.numeric(v) || is.null(v),
     class(tokens) %in% c("character", "factor", "numeric"),
     class(parts) %in% c("character", "factor", "numeric"),
-    identical(length(v), length(tokens), length(parts)),
-    "missing values in `v`" = !anyNA(v)
+    "missing values in `v`" = !anyNA(v),
+    is.list(fun) || is.character(fun) || is.expression(fun) || is.function(fun)
   )
 
-  # TODO: return length 0 data with length 0 input
+  if (is.null(v)) {
+    x <- as.data.frame(table(parts, tokens))
+    parts <- x[, 1]
+    tokens <- x[, 2]
+    v <- x[, 3]
+  }
+
+  stopifnot(identical(length(v), length(tokens), length(parts)))
+
+  if (!length(v)) {
+    return(numeric(0))
+  }
 
   non_zero <- v != 0
-  vars <- extract_vars(fun, builtin_disp())
-  tokens <- as_factor(tokens)
-  ans <- data.frame(parts = parts, i = tokens, v = as.numeric(v))[non_zero, ] |>
-    as.list() |>
-    eval_exprs(vars)
-  ans <- ans[c("f", fun)]
-
-  if (!is.null(names(fun))) names(ans) <- names(fun)
-  data.frame(types = levels(tokens), ans)
+  get_occur(
+    fun = c("types", "f", fun),
+    type = "disp",
+    parts = as_factor(parts)[non_zero],
+    v = as.numeric(v)[non_zero],
+    i = as_factor(tokens)[non_zero]
+  ) |>
+    data.frame()
 }
 
 utils::globalVariables(c("tokens", "parts", "v"))

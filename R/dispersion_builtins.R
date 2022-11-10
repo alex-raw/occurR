@@ -1,6 +1,6 @@
 builtin_disp <- function() {
-  expression(
-    # i = token index
+  expression(                           # i = token index
+    types    = levels(i),                # unique tokens
     N        = nlevels(i),              # number of unique types
     ids      = as_factor(parts),        # part index
     n        = nlevels(ids),
