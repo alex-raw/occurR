@@ -64,9 +64,9 @@ disp <- function(tokens, parts, v = NULL, fun = "dp_norm") {
   get_occur(
     fun = c("types", "f", fun),
     type = "disp",
-    parts = as_factor(parts)[non_zero],
-    v = as.numeric(v)[non_zero],
-    i = as_factor(tokens)[non_zero]
+    parts = as_factor(parts[non_zero]),
+    v = as.numeric(v[non_zero]),
+    i = as_factor(tokens[non_zero])
   ) |>
     data.frame()
 }
