@@ -1,44 +1,45 @@
 # data set on sentential adjective co-occurrence, cf. Justeson & Katz 1991
 
 # find and count all combinations of 2 adjectives within a sentence
-count_pairs_per_sentence <- function(words, s_id) {
-  combos <- fastmatch::ctapply(words, s_id, function(x) {
-    if (length(x) > 1) {
-      unique(combn(x, 2, sort.int, simplify = FALSE))
-    }
-  }) # get a list of pairs; sort so ab = ba and counted only once
-  uniques <- unique(combos)
+get_pairs <- function(matches) {
+  if (length(matches) > 1) {
+    unique(combn(matches, 2, sort.int, simplify = FALSE))
+  } # get a list of pairs; sort |> unique so a b and b a only appear once
+}
 
-  data.frame(
-    do.call(rbind, uniques),
-    as.vector(table(fastmatch::fmatch(combos, uniques)))
+get_cooccurrence <- function(corpus, p_attr, s_attr, tag, tag_column = "pos") {
+  tag_ids <- grep(tag, corpus[, tag_column])
+  tokens <- corpus[tag_ids, p_attr] |> tolower()
+  s_ids  <- corpus[tag_ids, s_attr]
+
+  .pairs <- fastmatch::ctapply(tokens, s_ids, get_pairs)
+  unique_pairs <- unique(.pairs)
+  word      <- sapply(unique_pairs, "[", 1)
+  collocate <- sapply(unique_pairs, "[", 2)
+
+  pair_counts <- table(fastmatch::fmatch(.pairs, unique_pairs))
+  word_counts <- table(tokens)
+
+  structure(
+    data.frame(
+      word      = word,
+      collocate = collocate,
+      o11       = as.vector(pair_counts),
+      f1        = as.vector(word_counts[word]),
+      f2        = as.vector(word_counts[collocate])
+    ),
+    corpus_size = nrow(corpus),
+    unique_jj = length(word_counts)
   )
-}
-
-get_pos <- function(corpus, tag) {
-  res <- subset(corpus, grepl(tag, pos), c(word, sentence))
-  res$word <- tolower(res$word)
-  res
-}
-
-get_cooccurrence <- function(corpus, tag) {
-  adjectives <- get_pos(corpus, tag)
-  counts <- table(adjectives$word)
-  .pairs <- count_pairs_per_sentence(adjectives$word, adjectives$sentence)
-
-  # join counts with word and collocate
-  cbind(.pairs,
-    as.vector(counts[.pairs[, 1]]),
-    as.vector(counts[.pairs[, 2]])
-  ) |>
-    structure(
-      names = c("word", "collocate", "o11", "f1", "f2"),
-      corpus_size = nrow(corpus),
-      unique_jj = length(counts)
-    )
 }
 
 data(brown)
 
-adjective_cooccurrence <- get_cooccurrence(brown, tag = "^jj")
+adjective_cooccurrence <- get_cooccurrence(
+  corpus = brown,
+  p_attr = "word",
+  s_attr = "doc_id",
+  tag = "^jj"
+)
+
 usethis::use_data(adjective_cooccurrence, overwrite = TRUE)
