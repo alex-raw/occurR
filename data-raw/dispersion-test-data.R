@@ -8,12 +8,11 @@ gries_dispersion1 <- gries_env$dispersions1
 .write_table <- \(...) utils::write.table(..., sep = "\t", na = "",
                                           quote = FALSE, row.names = FALSE)
 
-get_gries_dispersion <- function(corpus) {
-  res <- with(corpus, {
-    s <- table(id) / length(id)
-    v <- table(word, id)
-    apply(v, 1, gries_dispersion2, s)
-  }) |> # distance; produces a matrix of named lists...
+get_gries_dispersion <- function(tokens, doc_id) {
+   s <- table(doc_id) / length(doc_id)
+   v <- table(tokens, doc_id)
+   res <- apply(v, 1, gries_dispersion2, s) |>
+    # distance; produces a matrix of named lists...
     sapply(unlist) |> t() |> data.frame()
 
   res <- cbind(rownames(res), res)
@@ -26,28 +25,27 @@ get_gries_dispersion <- function(corpus) {
   res[order(res$types), ]
 }
 
-brown <- read.table("brown.tsv", quote = "", na.strings = "", header = TRUE,
-           colClasses = c("factor", "NULL", "factor", "NULL"))
-get_gries_dispersion(brown) |>
+data(brown)
+get_gries_dispersion(brown[, "word"], brown[, "doc_id"]) |>
   .write_table("../tests/testthat/test_data_dispersion.tsv")
 
 
 # very ineffecient implementation, takes a while
-get_gries_distances <- function(corpus) {
-  res <- with(corpus,
-    table(word) |> sort() |> names() |> sapply(
-      gries_dispersion1,
-      corpus = word,
-      corpus.parts = id,
-      with.distance.measures = TRUE
-    )) |>
+get_gries_distances <- function(tokens, doc_id) {
+  res <- sapply(
+    unique(tokens),
+    gries_dispersion1,
+    corpus = tokens,
+    corpus.parts = doc_id,
+    with.distance.measures = TRUE
+  ) |>
     apply(1, unlist)
 
   # first and last 6, last 6 are distance-based measures
-  res <- data.frame(rownames(res), res[, c(1, ncol(res) - 0:5)])
-  colnames(res) <- c("types", "f", "washtell", "f.ald", "ald", "f.awt", "awt", "arf")
+  res <- data.frame(unique(tokens), res[, c(1, ncol(res) - 0:5)])
+  colnames(res) <- c("types", "f", "washtell", "f_ald", "ald", "f_awt", "awt", "arf")
   res
 }
 
-get_gries_distances(brown) |>
+get_gries_distances(brown$word, brown$doc_id) |>
   .write_table("../tests/testthat/test_data_distance.tsv")

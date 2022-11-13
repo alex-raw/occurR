@@ -71,4 +71,17 @@ The following dispersion measures are currently available:
 \item{\code{D3}}{...}
 \item{\code{Ur}}{...}
 }
+
+The following distance-based dispersion measures are currently available:
+
+\describe{
+\item{\code{arf}}{...}
+\item{\code{awt}}{...}
+\item{\code{f_awt}}{...}
+\item{\code{ald}}{...}
+\item{\code{f_ald}}{...}
+\item{\code{washtell}}{...}
+\item{\code{dwg}}{...}
+\item{\code{dwg_norm}}{...}
+}
 }

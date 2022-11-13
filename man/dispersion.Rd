@@ -9,11 +9,11 @@
 \usage{
 dispersion(.x, ...)
 
-\method{dispersion}{data.frame}(.x, tokens, parts, v = NULL, fun = "dp_norm", ...)
+\method{dispersion}{data.frame}(.x, tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L, ...)
 
-\method{dispersion}{table}(.x, tokens, parts, ...)
+\method{dispersion}{table}(.x, tokens, parts, fun = "dp_norm", cutoff = 0L, ...)
 
-\method{dispersion}{default}(.x, tokens, parts, v, fun, ...)
+\method{dispersion}{default}(.x = NULL, tokens, parts, v = NULL, fun, cutoff = 0L, ...)
 }
 \arguments{
 \item{.x}{data.frame or list containing data}
@@ -30,6 +30,8 @@ part id where a part is usually text or text region.}
 \item{v}{integer. counts}
 
 \item{fun}{(named) character or list.}
+
+\item{cutoff}{integer minimum frequency for each type}
 }
 \description{
 Calculate word dispersion measures

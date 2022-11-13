@@ -64,6 +64,19 @@
 #' \item{\code{Ur}}{...}
 #' }
 #'
+#' The following distance-based dispersion measures are currently available:
+#'
+#' \describe{
+#' \item{\code{arf}}{...}
+#' \item{\code{awt}}{...}
+#' \item{\code{f_awt}}{...}
+#' \item{\code{ald}}{...}
+#' \item{\code{f_ald}}{...}
+#' \item{\code{washtell}}{...}
+#' \item{\code{dwg}}{...}
+#' \item{\code{dwg_norm}}{...}
+#' }
+#'
 #' @export
 available_measures <- function(stat = "") {
   assoc <- names(builtin_assoc())
@@ -71,13 +84,17 @@ available_measures <- function(stat = "") {
 
   # Values before range/ll are intermediate results
   i_assoc <- seq(which(assoc == "ll"), length(assoc))
-  i_disp <- seq(which(disp == "range"), length(disp))
+  i_disp <- seq(which(disp == "range"), which(disp == "Ur"))
+  i_dist <- seq(which(disp == "arf"), length(disp))
 
-  switch(stat,
+  res <- list(
     assoc = assoc[i_assoc],
     disp = disp[i_disp],
-    list(assoc = assoc[i_assoc], disp = disp[i_disp])
+    dist = disp[i_dist]
   )
+
+  if (identical(stat, "")) return(res)
+  unlist(res[stat], use.names = FALSE)
 }
 
 check_funs <- function(fun, exprs) {
@@ -152,4 +169,3 @@ evalapply <- function(x, exprs) {
 
   x
 }
-

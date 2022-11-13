@@ -5,7 +5,7 @@ test_that("available_measures returns correctly", {
   expect_true(all(c("dp", "dp_norm") %in% available_measures("disp")))
   expect_identical(available_measures("disp")[1], "range")
   expect_type(available_measures(), "list")
-  expect_length(available_measures(), 2)
+  expect_length(available_measures(), 3)
 })
 
 test_that("sum_by handles missing values", {
