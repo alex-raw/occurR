@@ -2,5 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 groupsum <- function(x, ng = 0L, g = 0L) {
-  .Call(`_occurR_groupsum`, x, ng, g)
+    .Call(`_occurR_groupsum`, x, ng, g)
 }
+
