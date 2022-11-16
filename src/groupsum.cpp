@@ -5,7 +5,7 @@ using namespace Rcpp;
 NumericVector groupsum(const NumericVector& x, int ng = 0, const IntegerVector& g = 0) {
   int l = x.size();
   if(l < 1) return x;
-  if(g.size() != l) stop("length(g) must match nrow(X)");
+  if(g.size() != l) stop("length(g) must match length(x)");
 
   NumericVector sum(ng);
   int ngs = 0;

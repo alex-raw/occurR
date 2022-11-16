@@ -10,7 +10,7 @@
 #' co-occurring structure; if omitted, sum of o11 is used
 #' @param n numeric of length 1 or equal to o11: corpus or sample size; if
 #' omitted, `sum(f1 + f2)` is used; this might be undesired in the case of
-#' collostruction analysis, where corpus size should always be explicitely
+#' collostruction analysis, where corpus size should always be explicitly
 #' passed
 #' @param fun character vector or named list containing character, function or
 #' expression elements: for built-in measures (see Details).
@@ -46,7 +46,7 @@
 #' res <- coll_analysis(.x, o11, f1, f2, n, fun = "ll")
 #' res[order(res$ll, decreasing = TRUE), ] |> head()
 #'
-#' # if arguments match column names, they can be used explicitely
+#' # if arguments match column names, they can be used explicitly
 #' c("o11", "f1", "f2") %in% names(.x) # TRUE
 #' coll_analysis(.x, n = n, fun = "ll") |>
 #'   head()
@@ -84,7 +84,7 @@ coll_analysis.data.frame <- function(.x, o11 = NULL, f1 = NULL, f2 = NULL,
 
   if (is.null(o11) || is.null(f1)) {
     stop("missing columns: at least o11 and f1 need to be present in the ",
-         "data.frame or specified explicitely")
+         "data.frame or specified explicitly")
   }
 
   res <- assoc(

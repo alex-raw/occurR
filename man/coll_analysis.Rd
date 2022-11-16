@@ -38,7 +38,7 @@ co-occurring structure; if omitted, sum of o11 is used}
 
 \item{n}{numeric of length 1 or equal to o11: corpus or sample size; if
 omitted, \code{sum(f1 + f2)} is used; this might be undesired in the case of
-collostruction analysis, where corpus size should always be explicitely
+collostruction analysis, where corpus size should always be explicitly
 passed}
 
 \item{fun}{character vector or named list containing character, function or
@@ -80,7 +80,7 @@ n <- attr(adjective_cooccurrence, "corpus_size")
 res <- coll_analysis(.x, o11, f1, f2, n, fun = "ll")
 res[order(res$ll, decreasing = TRUE), ] |> head()
 
-# if arguments match column names, they can be used explicitely
+# if arguments match column names, they can be used explicitly
 c("o11", "f1", "f2") \%in\% names(.x) # TRUE
 coll_analysis(.x, n = n, fun = "ll") |>
   head()
