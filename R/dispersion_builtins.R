@@ -64,7 +64,9 @@ builtin_disp <- function() {
       eq_one <- v == 1L
       v[eq_one] <- v[eq_one] - 1L
       1 / sum_by(i, N, v) * sum_by(i, N, pnearest) / (2L * f / l)
-    }
+    },
+    dwg = .dwg(d_sum_abs, f, l),
+    dwg_norm = .dwg(d_sum_abs, f, l, corr = TRUE)
   )
 }
 

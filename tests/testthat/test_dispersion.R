@@ -28,9 +28,11 @@ result_dist <- dispersion(brown, tokens = word, parts = doc_id, fun = dists)
 # )
 
 x_disp <- result_df[order(result_df$types), ][1:100, ]
-x_dist <- result_dist[order(result_dist$types), ][1:100, ]
 ref <- ref[order(ref$types), ][1:100, ]
-ref_dist <- ref_dist[order(ref_dist$types), ][1:100, colnames(x_dist)]
+
+ref_cols_dist <- c("types", "f", "arf", "awt", "f_awt", "ald", "f_ald", "washtell")
+x_dist <- result_dist[order(result_dist$types), ][1:100, ]
+ref_dist <- ref_dist[order(ref_dist$types), ][1:100, ref_cols_dist]
 
 test_that("data sets are here", {
   expect_s3_class(ref, "data.frame")
@@ -41,7 +43,7 @@ test_that("data sets are here", {
 
 test_that("values are consistent with Gries", {
   expect_equal(x_disp, ref, ignore_attr = TRUE)
-  expect_equal(x_dist, ref_dist, ignore_attr = TRUE)
+  expect_equal(x_dist[, ref_cols_dist], ref_dist, ignore_attr = TRUE)
 })
 
 test_that("minimal dp == dispersion(..., fun = \"dp\")", {

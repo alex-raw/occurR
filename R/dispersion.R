@@ -90,7 +90,7 @@ disp <- function(tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L) {
 
     groups <- split.default(cpos, tokens)
 
-    d_sum_squ <- d_sum_log10 <- d_pmin <- numeric(length(groups))
+    d_sum_squ <- d_sum_log10 <- d_pmin <- d_sum_abs <- numeric(length(groups))
     for (j in seq_along(groups)) {
       group <- groups[[j]]
       d <- c(0L, group + l - max(group)) # wrapping around
@@ -98,6 +98,7 @@ disp <- function(tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L) {
       d_sum_squ[j] <- sum(d^2)
       d_sum_log10[j] <- sum(d * log10(d))
       d_pmin[j] <- sum(pmin.int(d, l / length(d)))
+      d_sum_abs[j] <- sum(abs(d - l / length(d)))
     }
 
     if ("washtell" %in% fun) pnearest <- get_pnearest(cpos, tp)
