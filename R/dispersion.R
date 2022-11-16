@@ -49,7 +49,8 @@ disp <- function(tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L) {
     is.list(fun) || is.character(fun) || is.expression(fun) || is.function(fun)
   )
 
-  pnearest <- d <- l <-  NULL
+  pnearest <- d <- l <- d_sum_squ <- d_sum_log10 <- d_pmin <- d_sum_abs <- NULL
+
   with_dist <- any(fun %in% available_measures("dist"))
   if (with_dist) {
     if (!is.null(v)) stop("complete corpus required for distance-based measures")
@@ -62,19 +63,21 @@ disp <- function(tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L) {
   N <- nlevels(tokens)
 
   f <- if (is.null(v)) tabulate(tokens) else sum_by(tokens, N, v)
-  f_keep <- f > cutoff
-  keep <- !is.na(fastmatch::fmatch(as.integer(tokens), which(f_keep)))
 
-  tokens <- tokens[keep, drop = TRUE]
-  parts <- parts[keep, drop = TRUE]
-  f <- f[f_keep]
+  if (cutoff > 0L) {
+    f_keep <- f > cutoff
+    f <- f[f_keep]
+    keep <- !is.na(fastmatch::fmatch(as.integer(tokens), which(f_keep)))
+    tokens <- fdroplevels(tokens[keep])
+    parts <- fdroplevels(parts[keep])
+  }
 
   if (is.null(v)) {
-    x <- as.data.frame(table(parts, tokens))
-    non_zero <- x[, "Freq"] > 0L
-    p <- x[non_zero, 1L]
-    i <- x[non_zero, 2L]
-    v <- x[non_zero, 3L]
+    tp <- as.integer(tokens) * nlevels(parts) + as.integer(parts)
+    uxid <- !kit::fduplicated(tp)
+    p <- parts[uxid]
+    i <- tokens[uxid]
+    v <- tabulate(fastmatch::fmatch(tp, tp[uxid]))
   } else {
     non_zero <- v > 0L
     p <- parts[non_zero]
@@ -82,54 +85,42 @@ disp <- function(tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L) {
     v <- v[non_zero]
   }
 
-  d_sum_squ <- d_sum_log10 <- d_pmin <- NULL
   if (with_dist) {
-    cpos <- cpos[keep]
+    if (cutoff > 0L) cpos <- cpos[keep]
+
     groups <- split.default(cpos, tokens)
 
     d_sum_squ <- d_sum_log10 <- d_pmin <- numeric(length(groups))
     for (j in seq_along(groups)) {
       group <- groups[[j]]
-      d <- c(0L, group + l - max(group))
+      d <- c(0L, group + l - max(group)) # wrapping around
       d <- d[-1L] - d[-length(d)] # diff
       d_sum_squ[j] <- sum(d^2)
       d_sum_log10[j] <- sum(d * log10(d))
       d_pmin[j] <- sum(pmin.int(d, l / length(d)))
     }
 
-    if ("washtell" %in% fun) pnearest <- get_pnearest(tokens, parts, cpos)
+    if ("washtell" %in% fun) pnearest <- get_pnearest(cpos, tp)
+  }
+
+  if (!length(v) || identical(v, 0)) {
+    return(numeric(0))
   }
 
   stopifnot(identical(length(v), length(i), length(p)))
 
-  if (!length(v)) {
-    return(numeric(0))
-  }
-
-  get_occur(
-    fun = c("types", "f", fun),
-    type = "disp",
-    l = l,
-    d = d,
-    pnearest = pnearest,
-    v = as.numeric(v),
-    parts = p,
-    i = i,
-    d_sum_squ = d_sum_squ,
-    d_sum_log10 = d_sum_log10,
-    d_pmin = d_pmin
+  get_occur(fun = c("types", "f", fun), type = "disp",
+    f = f, l = l, v = v, parts = p, pnearest = pnearest, i = i,
+    d_sum_squ = d_sum_squ, d_sum_log10 = d_sum_log10, d_pmin = d_pmin,
+    d_sum_abs = d_sum_abs
   ) |>
     data.frame()
 }
 
-get_distances <- function(tokens, cpos, l) {
-}
-
-get_pnearest <- function(tokens, parts, cpos) {
-  tp <- as.integer(tokens) * nlevels(parts) + as.integer(parts) # interaction
-  groups <- split.default(cpos, tp)
+get_pnearest <- function(cpos, tp) {
+  groups <- split.default(cpos, as_factor(tp)) # split calls base::as.factor
   pnearest <- numeric(length(groups))
-  for (j in which(lengths(groups) > 1)) {
+  for (j in which(lengths(groups) > 1L)) {
     x <- groups[[j]]
     x <- x[-1L] - x[-length(x)] # diff
     pnearest[j] <- sum(1 / c(x[1L], pmin.int(x, c(x[-1L], Inf))))

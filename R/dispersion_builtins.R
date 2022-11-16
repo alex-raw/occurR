@@ -1,7 +1,12 @@
 builtin_disp <- function() {
   expression(
-    # i = token index, l = corpus size, v = count word in part,
-    # d = distances, pnearest = 1 / distance per part
+    # i = token index
+    # l = corpus size
+    # pnearest = 1 / distance per part
+    # d_sum_squ = sum of squared distances
+    # d_sum_log10 = sum of log distances
+    # d_pmin = parallel min of distances and
+    v        = as.numeric(v),           # count word in part
     types    = levels(i),               # unique tokens
     N        = nlevels(i),              # number of unique types
     ids      = as_factor(parts),        # part index
@@ -22,12 +27,6 @@ builtin_disp <- function() {
 
     # for distance-based measures
     exp_dist  = l / f,
-    # d_sum_squ = vapply(d, \(x) sum(x^2), 1),
-    # d_sum_log10 = vapply(d, \(x) sum(x * log10(x)), 1),
-    # d_pmin = vapply(d, \(x) sum(pmin.int(x, l / length(x))), 1),
-    # d_sum_squ = sum_by(i, N, d^2),
-    # d_sum_log10 = sum_by(i, N, d * log10(d)),
-    # d_pmin = sum_by(i, N, pmin(d, l / length(d))),
 
     # measures from Gries 2019: Analyzing dispersion
     range    = tabulate(i),
@@ -69,12 +68,19 @@ builtin_disp <- function() {
   )
 }
 
-max_min0 <- function(x, group, n, range) {
-  .tapply <- if (requireNamespace("fastmatch", quietly = TRUE))
-    fastmatch::ctapply else tapply
+.dwg <- function(d_sum_abs, f, l, corr = FALSE) {
+  mad <- d_sum_abs / f
+  worst_mad <- (l - f + 1 - l / f) / (f / 2)
+  ans <- mad / worst_mad
+  if (isTRUE(corr)) {
+    ans <- ans / (2 * atan(worst_mad) / atan(mad))
+  }
+  ans
+}
 
-  maxs <- .tapply(x, group, max, na.rm = FALSE)
-  mins <- .tapply(x, group, min, na.rm = FALSE)
+max_min0 <- function(x, group, n, range) {
+  maxs <- tapply(x, group, max, na.rm = FALSE)
+  mins <- tapply(x, group, min, na.rm = FALSE)
 
   non_zero <- range >= n
   maxs[non_zero] <- maxs[non_zero] - mins[non_zero]

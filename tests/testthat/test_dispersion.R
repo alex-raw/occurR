@@ -12,8 +12,8 @@ result_df <- as.data.frame(x_table, responseName = "v") |>
 result_raw <- dispersion(brown, tokens = word, parts = doc_id, fun = disps)
 
 test_that("table and data.frame methods are consistent", {
-  expect_identical(result_table, result_df)
-  expect_identical(result_raw, result_df)
+  expect_identical(result_table, result_df, ignore_attr = TRUE)
+  expect_identical(result_raw, result_df, ignore_attr = TRUE)
 })
 
 test_that("errors with incomplete corpus on distance measures", {
