@@ -6,14 +6,14 @@ x_table <- table(brown[, c("doc_id", "word")])
 
 result_table <- dispersion(x_table, tokens = "word", parts = "doc_id", fun = disps)
 
-result_df <- as.data.frame(x_table, responseName = "v") |>
+result_df <- as.data.frame(x_table, responseName = "v", stringsAsFactors = TRUE) |>
   dispersion(tokens = word, parts = doc_id, v = v, fun = disps)
 
 result_raw <- dispersion(brown, tokens = word, parts = doc_id, fun = disps)
 
 test_that("table and data.frame methods are consistent", {
-  expect_identical(result_table, result_df, ignore_attr = TRUE)
-  expect_identical(result_raw, result_df, ignore_attr = TRUE)
+  expect_equal(result_table, result_df, ignore_attr = TRUE)
+  expect_equal(result_raw, result_df, ignore_attr = TRUE)
 })
 
 test_that("errors with incomplete corpus on distance measures", {

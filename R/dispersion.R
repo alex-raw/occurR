@@ -31,7 +31,8 @@ dispersion.data.frame <- function(.x, tokens, parts, v = NULL, fun = "dp_norm", 
 #' @export
 dispersion.table <- function(.x, tokens, parts, fun = "dp_norm", cutoff = 0L, ...) {
   .df <- as.data.frame(.x, responseName = "v")
-  disp(tokens = .df[, tokens], parts = .df[, parts], v = .df[, "v"], fun = fun, cutoff = cutoff, ...)
+  disp(tokens = .df[, tokens], parts = .df[, parts], v = .df[, "v"], fun = fun,
+       cutoff = cutoff, ...)
 }
 
 #' @rdname dispersion
@@ -43,90 +44,90 @@ dispersion.default <- function(.x = NULL, tokens, parts, v = NULL, fun, cutoff =
 disp <- function(tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L) {
   stopifnot(
     is.numeric(v) || is.null(v),
-    class(tokens) %in% c("character", "factor", "numeric"),
-    class(parts) %in% c("character", "factor", "numeric"),
+    class(tokens) %in% c("character", "factor", "numeric", "integer"),
+    class(parts) %in% c("character", "factor", "numeric", "integer"),
     "missing values in `v`" = !anyNA(v),
     is.list(fun) || is.character(fun) || is.expression(fun) || is.function(fun)
   )
 
-  pnearest <- d <- l <- d_sum_squ <- d_sum_log10 <- d_pmin <- d_sum_abs <- NULL
-
-  with_dist <- any(fun %in% available_measures("dist"))
-  if (with_dist) {
+  if (any(fun %in% available_measures("dist"))) {
     if (!is.null(v)) stop("complete corpus required for distance-based measures")
-    l <- length(tokens)
     cpos <- seq_along(tokens)
   }
 
-  tokens <- as_factor(tokens)
-  parts <- as_factor(parts)
-  N <- nlevels(tokens)
+  # TODO: no longer needed for factors?
+  l <- length(tokens)
+  types <- if (is.factor(tokens)) levels(tokens) else kit::funique(tokens)
+  tokens <- fastmatch::fmatch(tokens, types)
+  N <- length(types)
+
+  parts_types <- if (is.factor(parts)) levels(parts) else kit::funique(parts)
+  parts <- fastmatch::fmatch(parts, parts_types)
+  n <- length(parts_types)
 
   f <- if (is.null(v)) tabulate(tokens) else sum_by(tokens, N, v)
 
-  if (cutoff > 0L) {
-    f_keep <- f > cutoff
-    f <- f[f_keep]
-    keep <- !is.na(fastmatch::fmatch(as.integer(tokens), which(f_keep)))
-    tokens <- fdroplevels(tokens[keep])
-    parts <- fdroplevels(parts[keep])
-  }
+  # if (cutoff > 0L) {
+  #   f_keep <- f > cutoff
+  #   f <- f[f_keep]
+  #   keep <- !is.na(fastmatch::fmatch(as.integer(tokens), which(f_keep)))
+  #   tokens <- fdroplevels(tokens[keep])
+  #   parts <- parts[keep]
+  #   N <- N - number_of_dropped_itmes
+  # }
 
   if (is.null(v)) {
-    tp <- as.integer(tokens) * nlevels(parts) + as.integer(parts)
-    uxid <- !kit::fduplicated(tp)
-    p <- parts[uxid]
-    i <- tokens[uxid]
-    v <- tabulate(fastmatch::fmatch(tp, tp[uxid]))
+    tp <- tokens * n + parts # interaction
+    itp <- !kit::fduplicated(tp)
+    ip <- parts[itp]
+    i <- tokens[itp]
+    v <- tabulate(fastmatch::fmatch(tp, tp[itp]))
   } else {
     non_zero <- v > 0L
-    p <- parts[non_zero]
+    ip <- parts[non_zero]
     i <- tokens[non_zero]
     v <- v[non_zero]
   }
 
-  if (with_dist) {
-    if (cutoff > 0L) cpos <- cpos[keep]
+  stopifnot(stats::var(c(length(v), length(i), length(ip))) == 0)
 
-    groups <- split.default(cpos, tokens)
+  # if (cutoff > 0L) cpos <- cpos[keep]
+  d <- if (any(fun %in% setdiff(available_measures("dist"), "washtell")))
+    group_distances(tokens, cpos, l)
 
-    d_sum_squ <- d_sum_log10 <- d_pmin <- d_sum_abs <- numeric(length(groups))
-    for (j in seq_along(groups)) {
-      group <- groups[[j]]
-      d <- c(0L, group + l - max(group)) # wrapping around
-      d <- d[-1L] - d[-length(d)] # diff
-      d_sum_squ[j] <- sum(d^2)
-      d_sum_log10[j] <- sum(d * log10(d))
-      d_pmin[j] <- sum(pmin.int(d, l / length(d)))
-      d_sum_abs[j] <- sum(abs(d - l / length(d)))
-    }
-
-    if ("washtell" %in% fun) pnearest <- get_pnearest(cpos, tp)
-  }
+  d_per_part <- if ("washtell" %in% fun)
+    group_distances(tp, cpos, per_part = TRUE)
 
   if (!length(v) || identical(v, 0)) {
     return(numeric(0))
   }
 
-  stopifnot(identical(length(v), length(i), length(p)))
-
-  get_occur(fun = c("types", "f", fun), type = "disp",
-    f = f, l = l, v = v, parts = p, pnearest = pnearest, i = i,
-    d_sum_squ = d_sum_squ, d_sum_log10 = d_sum_log10, d_pmin = d_pmin,
-    d_sum_abs = d_sum_abs
-  ) |>
-    data.frame()
+  out <- get_occur(fun = fun, type = "disp",
+    tokens = tokens, parts = parts, N = N, types = types,
+    n = n, f = f, l = l, v = v, ip = ip, i = i, d = d,
+    d_per_part = d_per_part
+  ) |> data.frame()
+  cbind(types, f, out)
 }
 
-get_pnearest <- function(cpos, tp) {
-  groups <- split.default(cpos, as_factor(tp)) # split calls base::as.factor
-  pnearest <- numeric(length(groups))
-  for (j in which(lengths(groups) > 1L)) {
-    x <- groups[[j]]
-    x <- x[-1L] - x[-length(x)] # diff
-    pnearest[j] <- sum(1 / c(x[1L], pmin.int(x, c(x[-1L], Inf))))
+# add one dummy token for each unique token;
+# diff to dummy == diff to corpus end or NA
+# first index of unique tokens == diff to first occurrence
+group_distances <- function(g, cpos, l = NULL, per_part = FALSE) {
+  is_unique <- !kit::fduplicated(g, fromLast = per_part)
+  uniques <- g[is_unique]
+  sort_id <- order(c(g, uniques))
+
+  dummies <- if (per_part) {
+    rep.int(Inf, length(uniques))
+  } else {
+    which(is_unique) + l
   }
-  pnearest
+
+  i <- c(cpos, dummies)[sort_id]
+  d <- c(i[-1L], 0L) - i # diff
+  # sort back to line up with types and remove dummies
+  d[order(sort_id)[seq_along(g)]]
 }
 
 utils::globalVariables(c("tokens", "parts", "v"))

@@ -111,14 +111,8 @@ check_funs <- function(fun, exprs) {
 as_factor <- function(x, levels = NULL, drop = FALSE) {
   if (is.factor(x)) return(x)
   ux <- kit::funique(x)
-  structure(fastmatch::fmatch(x, ux), levels = ux, class = "factor")
-}
-
-fdroplevels <- function (x) {
-  i <- as.integer(x)
-  drop <- fastmatch::fmatch(seq_along(levels(x)), i, nomatch = 0L) == 0L
-  if (sum(drop) == 0L) return(x)
-  structure(as_factor(i, i), levels = levels(x)[!drop], class = "factor")
+  fastmatch::fmatch(x, ux) |>
+    structure(levels = as.character(ux), class = "factor")
 }
 
 sum_by <- function(f, n, g) {

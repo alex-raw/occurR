@@ -1,22 +1,21 @@
 builtin_disp <- function() {
   expression(
-    # i = token index
+    # token = token index whole corpus
+    # i = token index per part
+    # N  = number of unique types
     # l = corpus size
-    # pnearest = 1 / distance per part
-    # d_sum_squ = sum of squared distances
-    # d_sum_log10 = sum of log distances
-    # d_pmin = parallel min of distances and
+    # f = count word in corpus
+    # d = distance to next token of same type (wrapping to first occurrence)
+    # d_per_part = distances per part (without wrapping to first occurrence)
+    # parts part index whole corpus
+    # ip  = part index per token
+    # n  = number of parts
     v        = as.numeric(v),           # count word in part
-    types    = levels(i),               # unique tokens
-    N        = nlevels(i),              # number of unique types
-    ids      = as_factor(parts),        # part index
-    n        = nlevels(ids),
-    sizes    = sum_by(ids, n, v),
+    sizes    = sum_by(ip, n, v),
 
     # vectorized values
-    s         = proportions(sizes)[ids], # % part in corpus
-    p         = v / sizes[ids],          # % word in part
-    f         = sum_by(i, N, v),         # count word in corpus
+    s         = proportions(sizes)[ip], # % part in corpus
+    p         = v / sizes[ip],          # % word in part
     v_rel     = v / f[i],
     f_mean    = f / n,
 
@@ -26,7 +25,10 @@ builtin_disp <- function() {
     f_sqrt   = sum_by(i, N, sqrt(v)),
 
     # for distance-based measures
-    exp_dist  = l / f,
+    sum_d_squ = sum_by(tokens, N, d^2),
+    d_sum_abs = sum_by(tokens, N, abs(d - l / f[tokens])),
+    mad = d_sum_abs / f,
+    worst_mad = (l - f + 1 - l / f) / (f / 2),
 
     # measures from Gries 2019: Analyzing dispersion
     range    = tabulate(i),
@@ -40,7 +42,7 @@ builtin_disp <- function() {
     D_eq     = 1 - cv_pop / sqrt(n - 1L),
     U_eq     = D_eq * f,
     D2       = carroll_d2(p, p_sum, i, n, N),
-    Um       = (f * D2) + (1 - D2) * f_mean,
+    Um       = f * D2 + (1 - D2) * f_mean,
     f_R      = sum_by(i, N, sqrt(v * s))^2,
     S        = f_R / f,
     dc       = (f_sqrt / n)^2 / f_mean,
@@ -55,34 +57,39 @@ builtin_disp <- function() {
     Ur       = kromer(v, i, N),
 
     # distance-based dispersions
-    arf = d_pmin / exp_dist,
-    awt = (1 + (1 / l * d_sum_squ)) / 2,
-    f_awt = l^2 / d_sum_squ,
-    ald = d_sum_log10 / l,
+    arf = f / l * sum_by(tokens, N, pmin.int(d, l / f[tokens])),
+    awt = (1 + sum_d_squ / l) / 2,
+    f_awt =  l^2 / sum_d_squ, # see Savicky & Hlavacova, appears as sum_d_squ / l^2 in Gries 2008
+    ald = sum_by(tokens, N, d * log10(d)) / l,
     f_ald = l * 10^-ald,
     washtell = {
-      eq_one <- v == 1L
-      v[eq_one] <- v[eq_one] - 1L
-      1 / sum_by(i, N, v) * sum_by(i, N, pnearest) / (2L * f / l)
+      pnearest <- sum_by(tokens, N, 1 / nearest_neighbor(d_per_part))
+      pnearest / sum_greater_one(i, N, v) / (2 * f / l)
     },
-    dwg = .dwg(d_sum_abs, f, l),
-    dwg_norm = .dwg(d_sum_abs, f, l, corr = TRUE)
+    dwg = mad / worst_mad,
+    dwg_norm = dwg / (2 * atan(worst_mad) / atan(mad))
   )
 }
 
-.dwg <- function(d_sum_abs, f, l, corr = FALSE) {
-  mad <- d_sum_abs / f
-  worst_mad <- (l - f + 1 - l / f) / (f / 2)
-  ans <- mad / worst_mad
-  if (isTRUE(corr)) {
-    ans <- ans / (2 * atan(worst_mad) / atan(mad))
-  }
-  ans
+sum_greater_one <- function(i, N, v) {
+  eq_one <- v == 1L
+  v[eq_one] <- v[eq_one] - 1L
+  sum_by(i, N, v)
+}
+
+nearest_neighbor <- function(x) {
+  num_inds <- which(is.finite(x))
+  left <- x[num_inds]
+  next_id <- left + num_inds
+  right <- x[next_id]
+  x[next_id] <- pmin.int(left, right)
+  x
 }
 
 max_min0 <- function(x, group, n, range) {
-  maxs <- tapply(x, group, max, na.rm = FALSE)
-  mins <- tapply(x, group, min, na.rm = FALSE)
+  groups <- split.default(x, group)
+  maxs <- vapply(groups, max, 1, na.rm = FALSE)
+  mins <- vapply(groups, min, 1, na.rm = FALSE)
 
   non_zero <- range >= n
   maxs[non_zero] <- maxs[non_zero] - mins[non_zero]
@@ -107,7 +114,7 @@ kromer <- function(x, group, N) { # nolint
 }
 
 .sd_pop <- function(v, n, range, mean, group, N) { # nolint
-  sqrt((sum_by(group, N, (v - mean[group])^2) + ((n - range) * mean^2)) / n)
+  sqrt((sum_by(group, N, (v - mean[group])^2) + (n - range) * mean^2) / n)
 }
 
 juilland_d <- function(p, n, range, p_sum, group, N) { # nolint
