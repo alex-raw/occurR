@@ -3,7 +3,6 @@ test_that("available_measures returns correctly", {
   expect_type(available_measures("assoc"), "character")
   expect_true(all(c("ll", "mi", "gmean") %in% available_measures("assoc")))
   expect_true(all(c("dp", "dp_norm") %in% available_measures("disp")))
-  expect_identical(available_measures("disp")[1], "range")
   expect_type(available_measures(), "list")
   expect_length(available_measures(), 3)
 })

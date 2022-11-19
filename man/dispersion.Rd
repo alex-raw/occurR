@@ -9,27 +9,46 @@
 \usage{
 dispersion(.x, ...)
 
-\method{dispersion}{data.frame}(.x, tokens, parts, v = NULL, fun = "dp_norm", cutoff = 0L, ...)
+\method{dispersion}{data.frame}(
+  .x,
+  tokens,
+  parts,
+  freq = NULL,
+  fun = "dp_norm",
+  type = c("per_part", "raw", "corpus"),
+  cutoff = 0L,
+  ...
+)
 
 \method{dispersion}{table}(.x, tokens, parts, fun = "dp_norm", cutoff = 0L, ...)
 
-\method{dispersion}{default}(.x = NULL, tokens, parts, v = NULL, fun, cutoff = 0L, ...)
+\method{dispersion}{default}(
+  .x = NULL,
+  tokens,
+  parts,
+  freq = NULL,
+  fun = "dp.norm",
+  type = c("per_part", "raw", "corpus"),
+  cutoff = 0L,
+  ...
+)
 }
 \arguments{
 \item{.x}{data.frame or list containing data}
 
 \item{...}{further arguments to be passed to or from other methods}
 
-\item{tokens}{character or factor; for table method, character specifying
-dimname; for data.frame method, expression specifying the column}
+\item{tokens}{character, factor, or expression specifying the data.frame
+column or table dim}
 
-\item{parts}{character or factor; for table method, character specifying
-dimname; for data.frame method, expression specifying the column
-part id where a part is usually text or text region.}
+\item{parts}{character, factor, or expression specifying the data.frame
+column or table dim}
 
-\item{v}{integer. counts}
+\item{freq}{integer counts}
 
-\item{fun}{(named) character or list.}
+\item{fun}{character or named list.}
+
+\item{type}{input type, see details}
 
 \item{cutoff}{integer minimum frequency for each type}
 }

@@ -84,7 +84,7 @@ available_measures <- function(stat = "") {
 
   # Values before range/ll are intermediate results
   i_assoc <- seq(which(assoc == "ll"), length(assoc))
-  i_disp <- seq(which(disp == "range"), which(disp == "Ur"))
+  i_disp <- seq(which(disp == "Ur"), which(disp == "D3"))
   i_dist <- seq(which(disp == "arf"), length(disp))
 
   res <- list(
@@ -116,6 +116,7 @@ as_factor <- function(x, levels = NULL, drop = FALSE) {
 }
 
 sum_by <- function(f, n, g) {
+  if (anyNA(f)) stop("Internal error")
   stopifnot(length(f) > 0, length(n) > 0, length(g) > 0)
   groupsum(g, n, f)
 }
