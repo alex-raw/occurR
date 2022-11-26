@@ -116,7 +116,6 @@ as_factor <- function(x, levels = NULL, drop = FALSE) {
 }
 
 sum_by <- function(f, n, g) {
-  if (anyNA(f)) stop("Internal error")
   stopifnot(length(f) > 0, length(n) > 0, length(g) > 0)
   groupsum(g, n, f)
 }

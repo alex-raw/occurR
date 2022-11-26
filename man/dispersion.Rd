@@ -20,7 +20,7 @@ dispersion(.x, ...)
   ...
 )
 
-\method{dispersion}{table}(.x, tokens, parts, fun = "dp_norm", cutoff = 0L, ...)
+\method{dispersion}{table}(.x, tokens = NULL, parts = NULL, fun = "dp_norm", cutoff = 0L, ...)
 
 \method{dispersion}{default}(
   .x = NULL,
@@ -39,10 +39,10 @@ dispersion(.x, ...)
 \item{...}{further arguments to be passed to or from other methods}
 
 \item{tokens}{character, factor, or expression specifying the data.frame
-column or table dim}
+column or table dimnames}
 
 \item{parts}{character, factor, or expression specifying the data.frame
-column or table dim}
+column or table dimnames; the part ids have to be contiguous}
 
 \item{freq}{integer counts}
 

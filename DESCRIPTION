@@ -13,11 +13,13 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Imports:
     stats,
     Rcpp,
-    kit
+    kit,
+    Matrix,
+    methods
 LinkingTo:
     Rcpp
 Suggests:
