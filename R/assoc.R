@@ -154,14 +154,8 @@ assoc <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...) {
     return(numeric(0))
   }
 
-  ans <- do.call(cbind, get_occur(
-    fun = fun,
-    type = "assoc",
-    f1 = f1,
-    o11 = o11,
-    f2 = f2,
-    n = n
-  ))
+  input <- list(f1 = f1, o11 = o11, f2 = f2, n = n)
+  ans <- do.call(cbind, get_occur(fun, "assoc", input))
 
   if (is.null(flip)) {
     return(ans)

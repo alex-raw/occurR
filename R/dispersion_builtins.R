@@ -3,11 +3,11 @@
 
 builtin_disp <- function() {
   expression(
-    l = corpus$l,                  # corpus size
-    i = corpus$i,                  # token index per part
-    j = corpus$j,                  # part index per token
-    f = as.numeric(corpus$f),      # count word in corpus
-    v = as.numeric(corpus$v),      # count word per part
+    l = l,                         # corpus size
+    i = i,                         # token index per part
+    j = j,                         # part index per token
+    f = as.numeric(f),             # count word in corpus
+    v = as.numeric(v),             # count word per part
     N = max(i),                    # number of unique types in sample
     n = max(j),                    # number of parts in sample
     .I = rep.int(seq_len(N), f),   # sorted token index corpus
@@ -20,7 +20,7 @@ builtin_disp <- function() {
     f_mean   = f / n,
 
     # for distance-based measures
-    sort_ids = order(corpus$itokens),
+    sort_ids = order(itokens),
     diffs = c(sort_ids[-1L], l) - sort_ids,
     d = group_distances(sort_ids, diffs, f, l), # distance between tokens (wrapping)
     awt_sum  = sum_by(.I, N, d^2),

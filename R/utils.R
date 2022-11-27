@@ -134,7 +134,7 @@ gather_vars <- function(exprs, .labels) {
   gather_vars(exprs, out)
 }
 
-get_occur <- function(fun, type, ...) {
+get_occur <- function(fun, type, .data) {
   .builtins <- switch(type, assoc = builtin_assoc(), disp = builtin_disp())
 
   .labels <- switch(class(fun),
@@ -160,7 +160,7 @@ get_occur <- function(fun, type, ...) {
 
   if (!is.list(fun) && !is.character(fun)) fun <- list(fun)
 
-  evalapply(list(...), exprs)[.labels]
+  evalapply(.data, exprs)[.labels]
 }
 
 evalapply <- function(x, exprs) {

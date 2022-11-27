@@ -150,15 +150,7 @@ disp <- function(
     return(numeric(0))
   }
 
-  data.frame(
-    types = vocab,
-    f = f,
-    get_occur(
-      fun = fun,
-      type = "disp",
-      corpus = corpus
-    )
-  )
+  data.frame(types = vocab, f = f, get_occur(fun,"disp", corpus))
 }
 
 to_index <- function(obj, .table) {
