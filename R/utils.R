@@ -108,11 +108,13 @@ check_funs <- function(fun, exprs) {
   }
 }
 
+.unique <- \(x) if (requireNamespace("kit", quietly = TRUE))
+  kit::funique(x) else unique(x)
+
 as_factor <- function(x, levels = NULL, drop = FALSE) {
   if (is.factor(x)) return(x)
-  ux <- kit::funique(x)
-  fastmatch::fmatch(x, ux) |>
-    structure(levels = as.character(ux), class = "factor")
+  ux <- .unique(x)
+  structure(fastmatch::fmatch(x, ux), levels = ux, class = "factor")
 }
 
 sum_by <- function(f, n, g) {

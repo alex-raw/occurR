@@ -17,14 +17,14 @@ RoxygenNote: 7.2.2
 Imports:
     stats,
     Rcpp,
-    kit,
+    fastmatch,
     Matrix,
     methods
 LinkingTo:
     Rcpp
 Suggests:
     Rfast,
-    fastmatch,
+    kit,
     data.table,
     testthat (>= 3.0.0),
     covr,
