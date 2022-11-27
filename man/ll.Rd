@@ -26,6 +26,6 @@ numeric
 Calculate loglikelihood association measures for vectors of counts.
 }
 \examples{
-ll(c(this = 41, is = 32, corpus = 41, data = 12), c(12, 1, 0, 3))
+ll(c(12, 1, 0, 3), c(this = 41, is = 32, corpus = 41, data = 12))
 
 }

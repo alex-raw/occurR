@@ -7,9 +7,9 @@
 dp(tokens, parts, v, norm = TRUE)
 }
 \arguments{
-\item{tokens}{character or factor}
+\item{tokens}{character or factor of the same length as \code{v}}
 
-\item{parts}{character or factor}
+\item{parts}{character or factor of the same length as \code{v}}
 
 \item{v}{integer vector with per document frequencies}
 

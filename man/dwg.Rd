@@ -4,17 +4,12 @@
 \alias{dwg}
 \title{Word Growth Dispersion}
 \usage{
-dwg(cpos, f, size, corr = TRUE)
+dwg(tokens, corr = TRUE)
 }
 \arguments{
-\item{cpos}{integer vector representing the indeces of a token}
+\item{tokens}{character raw corpus}
 
-\item{f}{integer count of a token}
-
-\item{size}{integer corpus size}
-
-\item{corr}{logical whether or not to apply a geometric correction, see
-Details}
+\item{corr}{logical whether or not to apply a geometric correction}
 }
 \value{
 numeric
@@ -26,6 +21,8 @@ A distance-based dispersion measure
 TODO:
 }
 \examples{
-dwg(c(41, 32, 41, 12), f = 4, size = 100)
+n <- 50
+tokens <- sample(letters, n, replace = TRUE)
+dwg(tokens)
 
 }

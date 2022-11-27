@@ -12,7 +12,7 @@
 #'
 #' @return numeric
 #' @examples
-#' ll(c(this = 41, is = 32, corpus = 41, data = 12), c(12, 1, 0, 3))
+#' ll(c(12, 1, 0, 3), c(this = 41, is = 32, corpus = 41, data = 12))
 #'
 #' @export
 ll <- function(o11, f1, n = sum(f1 + f2), f2 = sum(o11), one_sided = TRUE) {
@@ -21,7 +21,7 @@ ll <- function(o11, f1, n = sum(f1 + f2), f2 = sum(o11), one_sided = TRUE) {
   e <- cbind(e11 = f1 * f2,       e12 = (n - f1) * f2,
              e21 = f1 * (n - f2), e22 = (n - f1) * (n - f2)) / n
   ans <- 2 * rowSums(o * log(o / e), na.rm = TRUE)
-  if (isTRUE(one_sided)) {
+  if (one_sided) {
     repulsed <- o[, 1] < e[, 1]
     ans[repulsed] <- -ans[repulsed]
   }
@@ -32,26 +32,39 @@ ll <- function(o11, f1, n = sum(f1 + f2), f2 = sum(o11), one_sided = TRUE) {
 #'
 #' A distance-based dispersion measure
 #'
-#' @param cpos integer vector representing the indeces of a token
-#' @param f integer count of a token
-#' @param size integer corpus size
-#' @param corr logical whether or not to apply a geometric correction, see
-#' Details
+#' @param tokens character raw corpus
+#' @param corr logical whether or not to apply a geometric correction
 #'
 #' @return numeric
 #' @details TODO:
 #' @examples
-#' dwg(c(41, 32, 41, 12), f = 4, size = 100)
+#' n <- 50
+#' tokens <- sample(letters, n, replace = TRUE)
+#' dwg(tokens)
 #'
 #' @export
-dwg <- function(cpos, f, size, corr = TRUE) { # word growth dispersion
-  dd <- cpos - data.table::shift(cpos, fill = 0L) - (size / f)
-  mad <- sum(abs(dd)) / f
-  worst_mad <- (size - f + 1 - size / f) / (f / 2)
+dwg <- function(tokens, corr = TRUE) {
+  vocab <- unique(tokens)
+  itokens <- match(tokens, vocab)
+  f <- tabulate(itokens)
+
+  s <- sort.int(itokens, index.return = TRUE)
+  sort_ids <- s$ix
+  i <- s$x
+  l <- length(tokens)
+
+  d <- c(sort_ids[-1], l) - sort_ids
+  last <- cumsum(f)
+  first <- c(1, last[-length(last)] + 1)
+  d[last] <- sort_ids[first] + n - sort_ids[last]
+
+  mad <- rowsum(abs(d - l / f[i]), i)[, 1] / f
+  worst_mad <- (l - f + 1 - l / f) / (f / 2)
   ans <- mad / worst_mad
-  if (isTRUE(corr)) {
+  if (corr) {
     ans <- ans / (2 * atan(worst_mad) / atan(mad))
   }
+  names(ans) <- vocab
   ans
 }
 
@@ -60,8 +73,8 @@ dwg <- function(cpos, f, size, corr = TRUE) { # word growth dispersion
 #' TODO:
 #'
 #' @param v integer vector with per document frequencies
-#' @param tokens character or factor
-#' @param parts character or factor
+#' @param tokens character or factor of the same length as `v`
+#' @param parts character or factor of the same length as `v`
 #' @param norm logical whether or not to normalize, see Details
 #'
 #' @return numeric
@@ -79,8 +92,8 @@ dp <- function(tokens, parts, v, norm = TRUE) {
   parts <- as.factor(parts)
   f <- rowsum(v, tokens)[tokens, ]
   s <- proportions(rowsum(v, parts))[parts, ]
-  m <- rowsum(cbind(s, abs(v / f - s)), tokens, reorder = FALSE)
+  m <- rowsum(cbind(s, abs(v / f - s)), tokens)
   ans <- (1 - m[, 1L] + m[, 2L]) / 2
-  if (isTRUE(norm)) ans <- ans / (1 - min(s))
+  if (norm) ans <- ans / (1 - min(s))
   ans
 }
