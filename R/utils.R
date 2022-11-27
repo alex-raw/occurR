@@ -44,21 +44,21 @@
 #' \item{\code{idf}}{...}
 #' \item{\code{D}}{...}
 #' \item{\code{U}}{...}
-#' \item{\code{sd.pop}}{...}
-#' \item{\code{cv.pop}}{...}
-#' \item{\code{D.eq}}{...}
-#' \item{\code{U.eq}}{...}
+#' \item{\code{sd_pop}}{...}
+#' \item{\code{cv_pop}}{...}
+#' \item{\code{D_eq}}{...}
+#' \item{\code{U_eq}}{...}
 #' \item{\code{D2}}{...}
 #' \item{\code{Um}}{...}
-#' \item{\code{f.R}}{...}
+#' \item{\code{f_R}}{...}
 #' \item{\code{S}}{...}
 #' \item{\code{dc}}{...}
-#' \item{\code{f.R.eq}}{...}
-#' \item{\code{S.eq}}{...}
+#' \item{\code{f_R_eq}}{...}
+#' \item{\code{S_eq}}{...}
 #' \item{\code{kld}}{...}
-#' \item{\code{kld.norm}}{...}
+#' \item{\code{kld_norm}}{...}
 #' \item{\code{dp}}{...}
-#' \item{\code{dp.norm}}{...}
+#' \item{\code{dp_norm}}{...}
 #' \item{\code{chisq}}{...}
 #' \item{\code{D3}}{...}
 #' \item{\code{Ur}}{...}
@@ -84,7 +84,7 @@ available_measures <- function(stat = "") {
 
   # Values before range/ll are intermediate results
   i_assoc <- seq(which(assoc == "ll"), length(assoc))
-  i_disp <- seq(which(disp == "Ur"), which(disp == "D3"))
+  i_disp <- seq(which(disp == "range"), which(disp == "Ur"))
   i_dist <- seq(which(disp == "arf"), length(disp))
 
   res <- list(
@@ -125,9 +125,7 @@ sum_by <- function(f, n, g) {
 # recursively get all variable names necessary to calculate intermediate and
 # final values from list of expressions; essentially traverse the AST
 gather_vars <- function(exprs, .labels) {
-  out <- exprs[.labels] |>
-    all.vars() |>
-    union(.labels)
+  out <- union(all.vars(exprs[.labels]), .labels)
 
   if (identical(.labels, out)) {
     return(exprs[out])
@@ -149,26 +147,21 @@ get_occur <- function(fun, type, .data) {
     stop("If `fun` is a list, all elements have to be named")
   }
 
-  exprs <- lapply(fun, \(x) switch(class(x),
+  exprs <- c(.builtins, lapply(fun, \(x) switch(class(x),
+    `function` = body(x),
     `character` = {
       check_funs(x, .builtins)
       .builtins[[x]]
     },
-    `function` = body(x),
     x
-  )) |>
-    c(.builtins) |>
-    gather_vars(.labels)
+  )))
 
-  if (!is.list(fun) && !is.character(fun)) fun <- list(fun)
-
-  evalapply(.data, exprs)[.labels]
+  evalapply(.data, gather_vars(exprs, .labels))[.labels]
 }
 
 evalapply <- function(x, exprs) {
   for (i in names(exprs)) {
     x[[i]] <- eval(exprs[[i]], x)
   }
-
   x
 }

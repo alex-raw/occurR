@@ -3,15 +3,16 @@
 
 builtin_disp <- function() {
   expression(
-    l = l,                         # corpus size
-    i = i,                         # token index per part
-    j = j,                         # part index per token
+    # l,        # corpus size
+    # i,        # token index per part
+    # j,        # part index per token
+    # sort_ids, # position in sorted (grouped) corpus
+    # sizes,    # sizes of parts
     f = as.numeric(f),             # count word in corpus
     v = as.numeric(v),             # count word per part
     N = max(i),                    # number of unique types in sample
     n = max(j),                    # number of parts in sample
     .I = rep.int(seq_len(N), f),   # sorted token index corpus
-    sizes = sum_by(j, n, v),       # TODO: move to corpus constructor?
 
     # vectorized values
     s        = (sizes / sum(sizes))[j], # % part in corpus
@@ -20,7 +21,6 @@ builtin_disp <- function() {
     f_mean   = f / n,
 
     # for distance-based measures
-    sort_ids = order(itokens),
     diffs = c(sort_ids[-1L], l) - sort_ids,
     d = group_distances(sort_ids, diffs, f, l), # distance between tokens (wrapping)
     awt_sum  = sum_by(.I, N, d^2),
@@ -33,39 +33,39 @@ builtin_disp <- function() {
     f_sqrt   = sum_by(i, N, sqrt(v)),
 
     # measures from Gries 2019: Analyzing dispersion
-    Ur       = sum_by(i, N, .digamma(v + 1) - .digamma(1)),
-    kld      = sum_by(i, N, v_rel * log2(v_rel / s)),
-    sd_pop   = sqrt((sum_by(i, N, (v - f_mean[i])^2) + (n - range) * f_mean^2) / n),
-    maxmin   = max_min0(v, i, n, range),
     range    = tabulate(i, N),
-    engvall  = range * f_mean,
     idf      = log2(n / range),
-    U        = D * f,
+    maxmin   = max_min0(v, i, n, range),
+    engvall  = range * f_mean,
+    dp       = (1 - s_sum + sum_by(i, N, abs(v_rel - s))) / 2,
+    dp_norm  = dp / (1 - min(s)),
+    kld      = sum_by(i, N, v_rel * log2(v_rel / s)),
+    kld_norm = 1 - 2^-kld,
+    sd_pop   = sqrt((sum_by(i, N, (v - f_mean[i])^2) + (n - range) * f_mean^2) / n),
     cv_pop   = sd_pop / f_mean,
     D_eq     = 1 - cv_pop / sqrt(n - 1L),
     U_eq     = D_eq * f,
-    Um       = f * D2 + (1 - D2) * f_mean,
-    S        = sum_by(i, N, sqrt(v * s))^2 / f,
     dc       = (f_sqrt / n)^2 / f_mean,
-    f_R_eq   = f_sqrt^2 / n,
+    S        = sum_by(i, N, sqrt(v * s))^2 / f,
     S_eq     = f_R_eq / f,
-    kld_norm = 1 - 2^-kld,
-    dp       = (1 - s_sum + sum_by(i, N, abs(v_rel - s))) / 2,
-    dp_norm  = dp / (1 - min(s)),
-    D3       = 1 - chisq / (4 * f),
+    f_R_eq   = f_sqrt^2 / n,
     chisq    = (1L - s_sum) * f + sum_by(i, N, {
       f_exp <- s * f[i]
       (v - f_exp)^2 / f_exp
     }),
+    D3 = 1 - chisq / (4 * f),
     D = {
       p_mean <- p_sum / n
       D_sum <- sum_by(i, N, (p - p_mean[i])^2)
       1 - sqrt((D_sum + (n - range) * p_mean^2) / n) / p_mean / sqrt(n - 1L)
     },
+    U = D * f,
     D2 = {
       carrol_p <- p / p_sum[i]
       -sum_by(i, N, carrol_p * log2(carrol_p)) / log2(n)
     },
+    Um = f * D2 + (1 - D2) * f_mean,
+    Ur = sum_by(i, N, .digamma(v + 1) - .digamma(1)),
 
     # distance-based dispersions
     arf = f / l * sum_by(.I, N, pmin.int(d, l / f[.I])),
@@ -79,10 +79,9 @@ builtin_disp <- function() {
       v1 <- v
       eq_one <- v1 == 1L
       v1[eq_one] <- v1[eq_one] - 1L
-      sum_gt1 <- sum_by(i, N, v1)
-      wash_sum <- 1 / group_distances(sort_ids, diffs, v, l, per_part = TRUE)
+      wash_sum <- 1 / group_distances(sort_ids, diffs, v, l, TRUE)
       sum_by(.I, N, wash_sum) / # distance between tokens per part (no wrapping)
-        sum_gt1 / (2 * f / l)
+        sum_by(i, N, v1) / (2 * f / l)
     }
   )
 }
@@ -95,7 +94,7 @@ max_min0 <- function(v, i, n, range) {
   maxs <- vapply(groups, max, 1, USE.NAMES = FALSE)
 
   non_zero <- range >= n
-  mins <- vapply(groups[non_zero], min, 1, USE.NAMES = FALSE) |> suppressWarnings()
+  mins <- suppressWarnings(vapply(groups[non_zero], min, 1, USE.NAMES = FALSE))
   maxs[non_zero] <- maxs[non_zero] - mins
   maxs
 }
