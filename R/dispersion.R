@@ -95,7 +95,7 @@ dispersion.default <- function(
 
 disp <- function(
   tokens,
-  parts,
+  parts = NULL,
   freq = NULL,
   vocab = NULL,
   doc_ids = NULL,
@@ -105,53 +105,76 @@ disp <- function(
 ) {
   type <- match.arg(type)
 
-  if (type == "per_part" && any(available_measures("dist") %in% fun)) {
+  with_distance <- any(available_measures("dist") %in% fun)
+  if (type == "per_part" && with_distance) {
     stop("complete corpus required for distance-based measures")
   }
 
-  vocab <- unique_if_null(vocab, tokens)
-  doc_ids <- unique_if_null(doc_ids, parts)
-  itokens <- to_index(tokens, vocab)
-  iparts  <- to_index(parts, doc_ids)
-  corpus <- list()
-
-  if (type == "raw") {
-    corpus$itokens <- itokens
-    corpus$l <- length(tokens)
-  }
-
-  f <- switch(type,
-    raw = tabulate(itokens, length(vocab)),
-    per_part = sum_by(itokens, length(vocab), freq),
-    corpus = corpus$lexicon$f
-  )
-
-  corpus$f <- f[f != 0L]
-
-  # if (cutoff > 0L) {
-  #   keep <- f > cutoff
-  #   corpus$lexicon <- corpus$lexicon[keep, ]
-  #   keep_ids <- !is.na(match(itokens, which(keep)))
-  #   corpus$tokens <- corpus$tokens[keep_ids, ] # TODO: wtf that's expensive
-  # }
-
-  if (type == "per_part") {
-    corpus$i <- itokens
-    corpus$j <- iparts
-    corpus$v <- freq
-  } else {
-    m <- quick_table(iparts, itokens)
-    corpus$i <- m$j # this is reversed due to some sorting issue later on
-    corpus$j <- m$i
-    corpus$v <- m$x
-  }
+  corpus <- if (type == "corpus") tokens else
+    create_corpus(tokens, parts, freq, vocab, doc_ids, type, cutoff, with_distance)
 
   if (!length(corpus$v) || identical(corpus$v, 0)) {
     return(numeric(0))
   }
 
-  data.frame(types = vocab, f = f, get_occur(fun,"disp", corpus))
+  data.frame(types = corpus$vocab, f = corpus$f, get_occur(fun, "disp", corpus))
 }
+
+create_corpus <- function(
+  tokens,
+  parts,
+  freq = NULL,
+  vocab = NULL,
+  doc_ids = NULL,
+  type = c("per_part", "raw"),
+  cutoff = 0L,
+  with_distance = TRUE
+) {
+  type <- match.arg(type)
+
+  vocab <- unique_if_null(vocab, tokens)
+  doc_ids <- unique_if_null(doc_ids, parts)
+  itokens <- to_index(tokens, vocab)
+  iparts  <- to_index(parts, doc_ids)
+  sort_ids <- if (with_distance) order(itokens)
+  l <- length(tokens)
+
+  sizes <- switch(type,
+    raw = tabulate(iparts, length(doc_ids)),
+    per_part = sum_by(iparts, length(doc_ids), freq)
+  )
+
+  f <- switch(type,
+    raw = if (!is.null(freq)) freq else tabulate(itokens, length(vocab)),
+    per_part = sum_by(itokens, length(vocab), freq)
+  )
+
+  if (cutoff > 0L) {
+    vkeep <- f > cutoff
+    f <- f[vkeep]
+    vocab <- vocab[vkeep]
+
+    itokens <- match(itokens, which(vkeep))
+    ckeep <- !is.na(itokens)
+    itokens <- itokens[ckeep]
+    iparts <- iparts[ckeep]
+    sort_ids <- sort_ids[ckeep]
+  }
+
+  if (type == "per_part") {
+    i <- itokens
+    j <- iparts
+    v <- freq
+  } else {
+    m <- quick_table(iparts, itokens)
+    i <- m$j # this is reversed due to some sorting issue later on
+    j <- m$i
+    v <- m$x
+  }
+
+  list(l = l, f = f, i = i, j = j, v = v,
+       vocab = vocab, sort_ids = sort_ids, sizes = sizes)
+  }
 
 to_index <- function(obj, .table) {
   switch(class(obj),
@@ -164,21 +187,23 @@ to_index <- function(obj, .table) {
 
 unique_if_null <- function(x, y) {
   if (!is.null(x)) return(x)
-  if (is.factor(y)) levels(y) else kit::funique(y)
+  if (is.factor(y)) levels(y) else .unique(y)
 }
 
 # coercion to CsparseMatrix is magically much faster than manually calculating
 # interaction indeces and tabulating them; maybe should figure out how it's
 # done internally to remove this hack
 quick_table <- function(i, j) {
-  methods::new("dgTMatrix",
-    x = rep_len(1, length(i)),
-    Dim = c(max(i), max(j)),
-    i = as.integer(i) - 1L,
-    j = as.integer(j) - 1L
-  ) |>
-    methods::as("CsparseMatrix") |>
-    Matrix::mat2triplet()
+  Matrix::mat2triplet(
+    methods::as(
+      methods::new("dgTMatrix",
+        x = rep_len(1, length(i)),
+        Dim = c(max(i), max(j)),
+        i = as.integer(i) - 1L,
+        j = as.integer(j) - 1L
+      ), "CsparseMatrix"
+    )
+  )
 }
 
 utils::globalVariables(c("tokens", "parts", "v"))
