@@ -128,10 +128,6 @@ coll_analysis.matrix <- function(.x, f2 = NULL, n = NULL, fun = "ll",
 #' @export
 coll_analysis.default <- function(.x, o11, f1, f2 = NULL, n = NULL, fun = "ll",
                                   flip = NULL, ...) {
-  stop("currently only implemented for data.frame and matix input")
-}
-
-assoc <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...) {
   if (is.null(f2)) f2 <- sum(o11)
   if (is.null(n)) n <- sum(f1 + f2)
 
@@ -149,6 +145,13 @@ assoc <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...) {
     all(o11 <= n),
     is.list(fun) || is.character(fun) || is.expression(fun) || is.function(fun)
   )
+
+  assoc(o11, f1, f2, n, fun, flip)
+}
+
+assoc <- function(o11, f1, f2 = NULL, n = NULL, fun = "ll", flip = NULL, ...) {
+  if (is.null(f2)) f2 <- sum(o11)
+  if (is.null(n)) n <- sum(f1 + f2)
 
   if (!length(f1)) {
     return(numeric(0))

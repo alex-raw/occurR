@@ -20,18 +20,18 @@ test_that("bare-bones functions return same as main functions", {
 })
 
 test_that("doesn't allow o11 > f1/f2", {
-  expect_error(assoc(2, 1, 1, measures))
-  expect_error(assoc(2, 1, 2, measures))
-  expect_error(assoc(2, 2, 2, measures))
+  expect_error(coll_analysis.default(2, 1, 1, measures))
+  expect_error(coll_analysis.default(2, 1, 2, measures))
+  expect_error(coll_analysis.default(2, 2, 2, measures))
 })
 
 test_that("lengths", {
-  expect_error(assoc(0, c(12, 13), 12, 12, measures))
-  expect_error(assoc(1:4, 1:4, 20, numeric(0), measures))
-  expect_error(assoc(1:4, 1:4, numeric(0), 20, measures))
-  expect_error(assoc(1:4, numeric(0), 20, 20, measures))
-  expect_error(assoc(numeric(0), 1:4, 20, 20, measures))
-  expect_length(assoc(c(0:3), c(0:3)), 4)
+  expect_error(coll_analysis.default(NULL, 0, c(12, 13), 12, 12, measures))
+  expect_error(coll_analysis.default(NULL, 1:4, 1:4, 20, numeric(0), measures))
+  expect_error(coll_analysis.default(NULL, 1:4, 1:4, numeric(0), 20, measures))
+  expect_error(coll_analysis.default(NULL, 1:4, numeric(0), 20, 20, measures))
+  expect_error(coll_analysis.default(NULL, numeric(0), 1:4, 20, 20, measures))
+  expect_length(coll_analysis.default(NULL, c(0:3), c(0:3)), 4)
 })
 
 test_that("custom output columns", {
