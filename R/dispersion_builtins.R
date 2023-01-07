@@ -22,7 +22,7 @@ builtin_disp <- function() {
 
     # for distance-based measures
     diffs = c(sort_ids[-1L], l) - sort_ids,
-    d = group_distances(sort_ids, diffs, f, l), # distance between tokens (wrapping)
+    d = wrap_distances(sort_ids, diffs, f, l), # distance between tokens (wrapping)
     awt_sum  = sum_by(.I, N, d^2),
     mad = sum_by(.I, N, abs(d - l / f[.I])) / f,
     worst_mad = (l - f + 1 - l / f) / (f / 2),
@@ -79,7 +79,7 @@ builtin_disp <- function() {
       v1 <- v
       eq_one <- v1 == 1L
       v1[eq_one] <- v1[eq_one] - 1L
-      wash_sum <- 1 / group_distances(sort_ids, diffs, v, l, TRUE)
+      wash_sum <- 1 / nearest_neighbor(diffs, v)
       sum_by(.I, N, wash_sum) / # distance between tokens per part (no wrapping)
         sum_by(i, N, v1) / (2 * f / l)
     }
@@ -99,14 +99,32 @@ max_min0 <- function(v, i, n, range) {
   maxs
 }
 
-group_distances <- function(sort_ids, d, freq, n, per_part = FALSE) {
-  last <- cumsum(freq)
-  if (per_part) {
-    d[last] <- Inf
-    pmin.int(d, c(Inf, d[-length(d)])) # nearest neighbor
-  } else {
-    first <- c(1L, last[-length(last)] + 1L)
-    d[last] <- sort_ids[first] + n - sort_ids[last]
-    d
-  }
+nearest_neighbor <- function(d, v) {
+  last <- cumsum(v)
+  d[last] <- Inf
+  pmin.int(d, c(Inf, d[-length(d)]))
+}
+
+wrap_distances <- function(sort_ids, d, f, n) {
+  last <- cumsum(f)
+  first <- c(1L, last[-length(last)] + 1L)
+  d[last] <- sort_ids[first] + n - sort_ids[last]
+  d
+}
+
+dist_to_prev <- function(bool) {
+  inds <- which(bool)
+  ln <- length(bool)
+  if (!length(inds)) return(rep_len(NA_integer_, ln))
+  d <- c(inds, ln)[-1L] - inds
+  c(rep_len(NA_integer_, inds[1L]), sequence.default(d))
+}
+
+dist_to_nearest <- function(bool) {
+  .rev <- seq.int(length(bool), 1L)
+  pmin.int(
+    dist_to_prev(bool),
+    dist_to_prev(bool[.rev])[.rev],
+    na.rm = TRUE
+  )
 }

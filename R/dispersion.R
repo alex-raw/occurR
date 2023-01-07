@@ -172,7 +172,7 @@ create_corpus <- function(
     v <- m$x
   }
 
-  list(l = l, f = f, i = i, j = j, v = v,
+  list(iparts = iparts, l = l, f = f, i = i, j = j, v = v,
        vocab = vocab, sort_ids = sort_ids, sizes = sizes)
   }
 
