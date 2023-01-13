@@ -134,6 +134,11 @@ disp <- function(
 #' @param cutoff integer minimum frequency for each type
 #' @param with_distance logical whether or not to calculate distances required
 #' for distance measures
+#' @param no_match character, "fail" (default): throws an error if tokens contain
+#' NAs after creating an index. Typically, this happens when `vocab` is given
+#' and doesn't contain all types in the corpus; "remove": NAs are removed,
+#' "keep": treat NAs as separate type of token
+#' error
 #'
 #' @returns list of type "corpus"
 #'
@@ -160,9 +165,11 @@ create_corpus <- function(
   doc_ids = NULL,
   type = c("per_part", "raw"),
   cutoff = 0L,
-  with_distance = TRUE
+  with_distance = TRUE,
+  no_match = c("fail", "remove", "keep")
 ) {
   type <- match.arg(type)
+  no_match <- match.arg(no_match)
 
   vocab <- unique_if_null(vocab, tokens)
   doc_ids <- unique_if_null(doc_ids, parts)
@@ -170,6 +177,24 @@ create_corpus <- function(
   iparts  <- to_index(parts, doc_ids)
   sort_ids <- if (with_distance) order(itokens)
   l <- length(tokens)
+
+  if (anyNA(tokens)) {
+    if (no_match == "fail") {
+      stop("`tokens` contain NAs, make sure `vocab` contains all possible unique
+           tokens, or text is imported with `na.string` conversion disabled,
+           alternatively set `no_match` to a different value")
+    }
+    if (no_match == "remove") {
+      nas <- is.na(itokens)
+      itokens <- itokens[!nas]
+      iparts <- iparts[!nas]
+      if (with_distance) sort_ids <- sort_ids[!nas]
+    }
+    if (no_match == "keep") {
+      nas <- is.na(itokens)
+      itokens[nas] <- max(itokens) + 1L
+    }
+  }
 
   sizes <- switch(type,
     raw = tabulate(iparts, length(doc_ids)),
