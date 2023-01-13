@@ -120,6 +120,38 @@ disp <- function(
   data.frame(types = corpus$vocab, f = corpus$f, get_occur(fun, "disp", corpus))
 }
 
+#' Prepare corpus data for dispersion calculations
+#'
+#' From raw corpus or part-frequency list, create a list object containing
+#' descriptive stats and indexed tokens.
+#'
+#' @param tokens character vector with tokens
+#' @param parts character vector
+#' @param freq integer optional vector with counts
+#' @param vocab character or factor optional vector with unique tokens
+#' @param doc_ids character or factor optional vector with part ids
+#' @param type input type, either "per_part" or "raw"
+#' @param cutoff integer minimum frequency for each type
+#' @param with_distance logical whether or not to calculate distances required
+#' for distance measures
+#'
+#' @returns list of type "corpus"
+#'
+#' @details
+#' \describe{
+#' \item{\code{iparts}}{integer index of parts}
+#' \item{\code{l}}{number of tokens in the input}
+#' \item{\code{f}}{frequency per unique tokens}
+#' \item{\code{i}}{integer index of tokens per parts}
+#' \item{\code{j}}{integer index of parts per tokens}
+#' \item{\code{v}}{frequency of tokens per part}
+#' \item{\code{vocab}}{unique tokens}
+#' \item{\code{sort_ids}}{sorting permutation of tokens for use in distance
+#'                        based measures}
+#' \item{\code{sizes}}{sizes of parts}
+#' }
+#'
+#' @export
 create_corpus <- function(
   tokens,
   parts,
@@ -172,9 +204,18 @@ create_corpus <- function(
     v <- m$x
   }
 
-  list(iparts = iparts, l = l, f = f, i = i, j = j, v = v,
-       vocab = vocab, sort_ids = sort_ids, sizes = sizes)
-  }
+  structure(list(
+    iparts = iparts,
+    l = l,
+    f = f,
+    i = i,
+    j = j,
+    v = v,
+    vocab = vocab,
+    sort_ids = sort_ids,
+    sizes = sizes
+  ), class = "corpus")
+}
 
 to_index <- function(obj, .table) {
   switch(class(obj),
@@ -191,7 +232,7 @@ unique_if_null <- function(x, y) {
 }
 
 # coercion to CsparseMatrix is magically much faster than manually calculating
-# interaction indeces and tabulating them; maybe should figure out how it's
+# interaction indices and tabulating them; maybe should figure out how it's
 # done internally to remove this hack
 quick_table <- function(i, j) {
   Matrix::mat2triplet(
