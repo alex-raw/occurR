@@ -56,7 +56,7 @@ dwg <- function(tokens, corr = TRUE) {
   d <- c(sort_ids[-1], l) - sort_ids
   last <- cumsum(f)
   first <- c(1, last[-length(last)] + 1)
-  d[last] <- sort_ids[first] + n - sort_ids[last]
+  d[last] <- sort_ids[first] + l - sort_ids[last]
 
   mad <- rowsum(abs(d - l / f[i]), i)[, 1] / f
   worst_mad <- (l - f + 1 - l / f) / (f / 2)
