@@ -1,6 +1,7 @@
 #' Calculate word dispersion measures
 #'
-#' @param .x data.frame or list containing data
+#' @param .x data.frame or list containing data, or `corpus` constructed with
+#' `create_corpus`
 #' @param tokens character, factor, or expression specifying the data.frame
 #' column or table dimnames
 #' @param parts character, factor, or expression specifying the data.frame
@@ -53,10 +54,24 @@ dispersion.table <- function(
     parts = .df[, if (is.null(parts)) 2L else parts],
     freq = .df[, "v"],
     fun = fun,
-    cutoff = cutoff, # TODO: NULL to switch off?
+    cutoff = cutoff,
     type = "per_part",
     ...
   )
+}
+
+#' @rdname dispersion
+#' @export
+dispersion.corpus <- function(
+  .x,
+  tokens = NULL,
+  parts = NULL,
+  freq = NULL,
+  fun = "dp.norm",
+  cutoff = 0L,
+  ...
+) {
+  disp(.x, fun = fun, type = "corpus", cutoff = cutoff)
 }
 
 #' @rdname dispersion
@@ -67,7 +82,7 @@ dispersion.default <- function(
   parts,
   freq = NULL,
   fun = "dp.norm",
-  type = c("per_part", "raw", "corpus"),
+  type = c("per_part", "raw"),
   cutoff = 0L,
   ...
 ) {
@@ -84,7 +99,7 @@ dispersion.default <- function(
     freq <- freq[keep]
   }
   disp(
-    tokens = tokens,
+    .x = tokens,
     parts = parts,
     freq = freq,
     fun = fun,
@@ -94,7 +109,7 @@ dispersion.default <- function(
 }
 
 disp <- function(
-  tokens,
+  .x,
   parts = NULL,
   freq = NULL,
   vocab = NULL,
@@ -110,8 +125,8 @@ disp <- function(
     stop("complete corpus required for distance-based measures")
   }
 
-  corpus <- if (type == "corpus") tokens else
-    create_corpus(tokens, parts, freq, vocab, doc_ids, type, cutoff, with_distance)
+  corpus <- if (type == "corpus") .x else
+    create_corpus(.x, parts, freq, vocab, doc_ids, type, cutoff, with_distance)
 
   if (!length(corpus$v) || identical(corpus$v, 0)) {
     return(numeric(0))
@@ -181,8 +196,8 @@ create_corpus <- function(
   if (anyNA(tokens)) {
     if (no_match == "fail") {
       stop("`tokens` contain NAs, make sure `vocab` contains all possible unique
-           tokens, or text is imported with `na.string` conversion disabled,
-           alternatively set `no_match` to a different value")
+           tokens, and/or that text is imported with `na.string` conversion
+           disabled, alternatively set `no_match` to a different value")
     }
     if (no_match == "remove") {
       nas <- is.na(itokens)

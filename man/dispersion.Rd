@@ -4,6 +4,7 @@
 \alias{dispersion}
 \alias{dispersion.data.frame}
 \alias{dispersion.table}
+\alias{dispersion.corpus}
 \alias{dispersion.default}
 \title{Calculate word dispersion measures}
 \usage{
@@ -22,19 +23,30 @@ dispersion(.x, ...)
 
 \method{dispersion}{table}(.x, tokens = NULL, parts = NULL, fun = "dp_norm", cutoff = 0L, ...)
 
+\method{dispersion}{corpus}(
+  .x,
+  tokens = NULL,
+  parts = NULL,
+  freq = NULL,
+  fun = "dp.norm",
+  cutoff = 0L,
+  ...
+)
+
 \method{dispersion}{default}(
   .x = NULL,
   tokens,
   parts,
   freq = NULL,
   fun = "dp.norm",
-  type = c("per_part", "raw", "corpus"),
+  type = c("per_part", "raw"),
   cutoff = 0L,
   ...
 )
 }
 \arguments{
-\item{.x}{data.frame or list containing data}
+\item{.x}{data.frame or list containing data, or \code{corpus} constructed with
+\code{create_corpus}}
 
 \item{...}{further arguments to be passed to or from other methods}
 

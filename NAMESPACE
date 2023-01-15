@@ -3,6 +3,7 @@
 S3method(coll_analysis,data.frame)
 S3method(coll_analysis,default)
 S3method(coll_analysis,matrix)
+S3method(dispersion,corpus)
 S3method(dispersion,data.frame)
 S3method(dispersion,default)
 S3method(dispersion,table)
