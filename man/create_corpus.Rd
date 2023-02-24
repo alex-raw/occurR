@@ -34,9 +34,9 @@ create_corpus(
 \item{with_distance}{logical whether or not to calculate distances required
 for distance measures}
 
-\item{no_match}{character, "fail" (default): throws an error if tokens contain
-NAs after creating an index. Typically, this happens when \code{vocab} is given
-and doesn't contain all types in the corpus; "remove": NAs are removed,
+\item{no_match}{character, "fail" (default): throws an error if tokens
+contain NAs after creating an index. Typically, this happens when \code{vocab} is
+given and doesn't contain all types in the corpus; "remove": NAs are removed,
 "keep": treat NAs as separate type of token
 error}
 }
