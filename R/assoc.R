@@ -95,6 +95,7 @@ coll_analysis.data.frame <- function(.x, o11 = NULL, f1 = NULL, f2 = NULL,
     fun = fun,
     flip = flip
   )
+
   cbind(Filter(\(x) is.character(x) || is.factor(x), .x), res)
 }
 

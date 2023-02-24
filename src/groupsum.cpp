@@ -8,7 +8,6 @@ NumericVector groupsum(const NumericVector& x, int ng = 0, const IntegerVector& 
   if(g.size() != l) stop("length(g) must match length(x)");
 
   NumericVector sum(ng);
-  int ngs = 0;
   for(int i = 0; i != l; ++i) {
     sum[g[i]-1] += x[i];
   }

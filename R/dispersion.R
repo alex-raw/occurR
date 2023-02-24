@@ -149,9 +149,9 @@ disp <- function(
 #' @param cutoff integer minimum frequency for each type
 #' @param with_distance logical whether or not to calculate distances required
 #' for distance measures
-#' @param no_match character, "fail" (default): throws an error if tokens contain
-#' NAs after creating an index. Typically, this happens when `vocab` is given
-#' and doesn't contain all types in the corpus; "remove": NAs are removed,
+#' @param no_match character, "fail" (default): throws an error if tokens
+#' contain NAs after creating an index. Typically, this happens when `vocab` is
+#' given and doesn't contain all types in the corpus; "remove": NAs are removed,
 #' "keep": treat NAs as separate type of token
 #' error
 #'
